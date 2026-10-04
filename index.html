@@ -836,7 +836,7 @@ body[data-view] .form-patient-search label{font-size:14px;font-weight:600;color:
 body[data-view] .form-patient-link{font-size:13px;color:#0b4a2e}
 body[data-view] .lookup-row{font-size:13px}
 @media(pointer:coarse){body[data-view] .field :is(input,select,textarea){font-size:16px}}
-body[data-view="dashboard"] .patient-workspace{display:none}
+body:is([data-view="dashboard"],[data-view="report"],[data-view="executive"],[data-view="references"],[data-view="users"]) .patient-workspace{display:none}
 @media(max-width:700px){body[data-view] .field label{font-size:13px}body[data-view] .section-btn{font-size:12px}body[data-view] :is(.main,.modal) .choice-option{font-size:12.5px}}
 }
 </style>
@@ -1071,11 +1071,11 @@ function reportHTML(d){const r=state.report,fields=r.fields;return heading('ร�
 function printPage(){document.querySelectorAll('input,select,textarea').forEach(el=>{const mirror=el.parentElement.querySelector('.print-mirror');if(mirror)mirror.textContent=el.type==='date'?dateTH(el.value):el.value;});if($('dashboardSummary')){let mirror=$('dashboardSummary').parentElement.querySelector('.print-mirror');if(!mirror){mirror=document.createElement('div');mirror.className='print-mirror';$('dashboardSummary').after(mirror);}mirror.textContent=$('dashboardSummary').value;}window.print();}
 function navRender(){ $('nav').innerHTML=navigation.filter(([key])=>key!=='users'||currentUser?.role==='admin').map(([key,label,ico],i)=>(i===6?'<div class="nav-caption" style="margin-top:20px">INSIGHTS & RESOURCES</div>':'')+'<button class="nav-btn '+(state.view===key?'active':'')+'" data-view="'+key+'">'+icon(ico)+esc(label)+'</button>').join('');$('nav').querySelectorAll('.nav-btn[data-view]').forEach(b=>b.onclick=()=>navigate(b.dataset.view)); }
 async function navigate(view){if(state.reportDirty&&!confirm('รายงานมีข้อมูลที่ยังไม่บันทึก ต้องการออกจากหน้านี้หรือไม่?'))return;state.reportDirty=false;state.view=view;state.page=1;setNavigationOpen(false);navRender();$('crumb').textContent=navigation.find(n=>n[0]===view)[1];await loadView();window.scrollTo({top:0,behavior:'smooth'});}
-async function loadView(){const version=++state.requestVersion,view=state.view;document.body.dataset.view=view;$('page').innerHTML='<div class="loading-text">กำลังโหลดข้อมูลจาก '+BACKEND_NAME+'…</div><div class="loading-grid">'+Array(6).fill('<div class="skeleton"></div>').join('')+'</div>';try{if(view==='executive'||view==='users'){await loadExtendedView(view,version);applyAccessUI();return;}if(view==='dashboard'){const d=await api('getDashboard',state.filters);if(version!==state.requestVersion)return;state.dash=d;$('page').innerHTML=dashboardHTML(d);bindToolbar();$('newPatient').onclick=()=>openNewPatient();document.querySelectorAll('.overdue-open').forEach(b=>b.onclick=()=>openRecord('HF_Patient_Data',+b.dataset.row));$('dashboardSummary').oninput=()=>{state.summaryDirty=true;};$('saveSummary').onclick=async()=>{const btn=$('saveSummary');btn.disabled=true;try{await api('saveDashboardSummary',$('dashboardSummary').value,d.summary);state.summaryDirty=false;toast('บันทึกสรุปผลใน '+BACKEND_NAME+' แล้ว');await loadView();}catch(e){toast(e.message,true);}finally{btn.disabled=false;}};$('footerStatus').textContent='อัปเดต '+d.updatedAt;}
+async function loadView(silent){silent=silent===true;const version=++state.requestVersion,view=state.view;document.body.dataset.view=view;if(!silent)$('page').innerHTML='<div class="loading-text">กำลังโหลดข้อมูลจาก '+BACKEND_NAME+'…</div><div class="loading-grid">'+Array(6).fill('<div class="skeleton"></div>').join('')+'</div>';try{if(view==='executive'||view==='users'){await loadExtendedView(view,version);applyAccessUI();return;}if(view==='dashboard'){const d=await api('getDashboard',state.filters);if(version!==state.requestVersion)return;state.dash=d;$('page').innerHTML=dashboardHTML(d);bindToolbar();$('newPatient').onclick=()=>openNewPatient();document.querySelectorAll('.overdue-open').forEach(b=>b.onclick=()=>openRecord('HF_Patient_Data',+b.dataset.row));$('dashboardSummary').oninput=()=>{state.summaryDirty=true;};$('saveSummary').onclick=async()=>{const btn=$('saveSummary');btn.disabled=true;try{await api('saveDashboardSummary',$('dashboardSummary').value,d.summary);state.summaryDirty=false;toast('บันทึกสรุปผลใน '+BACKEND_NAME+' แล้ว');await loadView();}catch(e){toast(e.message,true);}finally{btn.disabled=false;}};$('footerStatus').textContent='อัปเดต '+d.updatedAt;}
  else if(view==='references'){const fresh=await api('getBootstrap');if(version!==state.requestVersion)return;state.boot=fresh;$('page').innerHTML=referenceHTML();document.querySelectorAll('[data-reference]').forEach(b=>b.onclick=()=>{state.reference=b.dataset.reference;loadView();});$('printReference').onclick=printPage;}
  else if(view==='report'){const [report,d]=await Promise.all([api('getReport'),api('getDashboard',state.filters)]);if(version!==state.requestVersion)return;state.report=report;state.dash=d;report.fields.start=state.filters.start||report.fields.start;report.fields.end=state.filters.end||report.fields.end;report.fields.clinic=state.filters.clinic;$('page').innerHTML=reportHTML(d);bindToolbar();$('printReport').onclick=printPage;document.querySelectorAll('[data-report],.report-note').forEach(el=>el.oninput=()=>{state.reportDirty=true;});bindReportRange();bindReportSave();}
  else {const data=await api('listRecords',view,state.filters,state.page,10);if(version!==state.requestVersion)return;state.table=data;$('page').innerHTML=recordTableHTML(view,data);bindToolbar();$('newRecord').onclick=()=>openRecord(view);document.querySelectorAll('.edit-record').forEach(b=>b.onclick=()=>openRecord(view,+b.dataset.row));$('prevPage').onclick=()=>{state.page=data.page-1;loadView();};$('nextPage').onclick=()=>{state.page=data.page+1;loadView();};}
- applyAccessUI();}catch(e){if(version!==state.requestVersion)return;$('connection').textContent='เชื่อมต่อ GS ไม่สำเร็จ';$('page').innerHTML=heading('โหลดข้อมูลไม่สำเร็จ','ตรวจสอบการเชื่อมต่อและสิทธิ์เข้าถึงไฟล์')+'<div class="error-panel">'+esc(e.message)+'<div style="margin-top:15px"><button id="retry" class="btn">'+icon('refresh')+'ลองอีกครั้ง</button></div></div>';$('retry').onclick=loadView;toast(e.message,true);}}
+ applyAccessUI();}catch(e){if(version!==state.requestVersion)return;$('connection').textContent='เชื่อมต่อ GS ไม่สำเร็จ';if(silent)return;$('page').innerHTML=heading('โหลดข้อมูลไม่สำเร็จ','ตรวจสอบการเชื่อมต่อและสิทธิ์เข้าถึงไฟล์')+'<div class="error-panel">'+esc(e.message)+'<div style="margin-top:15px"><button id="retry" class="btn">'+icon('refresh')+'ลองอีกครั้ง</button></div></div>';$('retry').onclick=loadView;toast(e.message,true);}}
 function captureReport(){document.querySelectorAll('[data-report]').forEach(el=>state.report.fields[el.dataset.report]=el.value);document.querySelectorAll('.report-note').forEach(el=>state.report.notes[+el.dataset.note]=el.value);}
 function renderReportPreserving(){$('page').innerHTML=reportHTML(state.dash);bindToolbar();$('printReport').onclick=printPage;document.querySelectorAll('[data-report],.report-note').forEach(el=>el.oninput=()=>{state.reportDirty=true;});bindReportRange();bindReportSave();}
 // Changing the report range only flags the numbers as stale; they are fetched again when the user presses the recalc button.
@@ -1126,7 +1126,7 @@ function bindAccounts(){resetAccountForm();$('newAccount').onclick=resetAccountF
 async function loadExtendedView(view,version){if(view==='executive'){const model=await api('getExecutiveReport',state.filters);if(version!==state.requestVersion)return;executiveReport=model;$('page').innerHTML=executiveHTML(model);bindToolbar();$('exportDocx').onclick=()=>downloadExecutive('docx');$('exportXlsx').onclick=()=>downloadExecutive('xlsx');$('printExecutive').onclick=printPage;}
  else{if(currentUser?.role!=='admin')throw new Error('บัญชีนี้ไม่มีสิทธิ์จัดการผู้ใช้');accountRows=await api('listUsers');if(version!==state.requestVersion)return;$('page').innerHTML=usersHTML();bindAccounts();}}
 
-let refreshRunning=false,lastMetadataRefresh=Date.now();
+let refreshRunning=false,lastMetadataRefresh=Date.now(),lastAutoRefresh=Date.now();
 function canRefreshFromSheets(){
  const focus=document.activeElement;
  if(!LIVE||!sessionToken||!state.boot||pendingRequests||document.hidden||state.dirty||state.reportDirty||state.summaryDirty)return false;
@@ -1140,7 +1140,7 @@ async function refreshFromSheets(){
  refreshRunning=true;
  try{
   if(Date.now()-lastMetadataRefresh>=300000){const metadata=await api('getBootstrap');if(sessionToken!==token||version!==state.requestVersion||!canRefreshFromSheets())return false;state.boot=metadata;currentUser=metadata.user;navRender();lastMetadataRefresh=Date.now();}
-  clearApiCache();await loadView();await refreshLinkedPatientFromSheets();return true;
+  clearApiCache();lastAutoRefresh=Date.now();await loadView(true);await refreshLinkedPatientFromSheets();return true;
  }catch(error){if(sessionToken)$('connection').textContent='เชื่อมต่อ GS ไม่สำเร็จ';return false;}
  finally{refreshRunning=false;}
 }
@@ -1458,7 +1458,7 @@ $('reconnectBackend').onclick=reconnectBackend;
 if(sessionToken){$('loginScreen').hidden=true;document.querySelector('.shell').hidden=false;init();}else showLogin();
 connectBackend().catch(error=>backendStatus(error.message));
 setInterval(refreshFromSheets,60000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshFromSheets();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-lastAutoRefresh>=30000)refreshFromSheets();});
 window.addEventListener('online',()=>{connectBackend().then(refreshFromSheets).catch(error=>backendStatus(error.message));});
 
 </script>
