@@ -57,6 +57,35 @@
 }
 @media print{.hfc-chart-viz svg{max-height:215px}.hfc-new-section{break-inside:avoid}}
 
+
+/* 2026-10-13 clinical dashboard: GDMT contraindications and appropriateness. */
+.hfc-review-head{margin-top:4px}
+.hfc-review-legend{display:flex;flex-wrap:wrap;gap:12px;color:var(--muted);font-size:10px;margin-top:14px}
+.hfc-review-legend span{display:flex;gap:6px;align-items:center}
+.hfc-review-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.hfc-review-status{font-size:11px;color:var(--muted);line-height:1.7;padding:24px 8px}
+.hfc-review-status strong{display:block;color:var(--ink);font-size:12px}
+.hfc-review-row{margin-bottom:17px}
+.hfc-review-label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:var(--ink);margin-bottom:7px}
+.hfc-review-label strong{font-size:13px}
+.hfc-review-track{width:100%;height:13px;overflow:hidden;border-radius:12px;background:#edf3ee}
+.hfc-review-fill{height:100%;border-radius:12px;background:linear-gradient(90deg,#b79754,#dcba78);min-width:0}
+.hfc-review-donut{width:166px;height:166px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;background:conic-gradient(#148d6f 0 var(--hfc-ok),#cf9364 var(--hfc-ok) var(--hfc-checked),#e9eeeb var(--hfc-checked) 100%)}
+.hfc-review-donut-inner{width:116px;height:116px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;box-shadow:0 4px 20px #123d2811}
+.hfc-review-donut-inner b{font-size:24px;color:var(--ink);font-weight:800}
+.hfc-review-donut-inner small{font-size:10px;color:var(--muted)}
+.hfc-review-layout{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:27px;min-height:194px}
+.hfc-review-breakdown{flex:1;min-width:185px;max-width:280px;display:grid;gap:12px}
+.hfc-review-breakdown .entry{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--ink);font-size:11px}
+.hfc-review-breakdown .entry b{font-size:17px;color:var(--ink)}
+.hfc-review-footer{color:var(--muted);font-size:10px;line-height:1.7;margin-top:14px}
+.hfc-review-subheading{font-size:11px;font-weight:700;color:var(--ink);margin:18px 0 7px}
+.hfc-review-pheno{display:flex;flex-wrap:wrap;gap:10px}
+.hfc-review-pheno .ph{border-radius:10px;background:#f5faf6;border:1px solid #e2eee7;padding:9px 13px;flex:1;min-width:112px}
+.hfc-review-pheno .ph b{font-size:15px;display:block;color:#21725a}
+.hfc-review-pheno .ph span{font-size:10px;color:var(--muted)}
+@media(max-width:700px){.hfc-review-layout{gap:16px}.hfc-review-donut{width:135px;height:135px}.hfc-review-donut-inner{height:96px;width:96px}.hfc-review-donut-inner b{font-size:19px}.hfc-review-breakdown{min-width:160px}.hfc-review-pheno .ph{min-width:105px}}
+
 </style>
 <style>
 /* Luminous clinical workspace — pearl, emerald and luminous mint. */
@@ -1123,6 +1152,72 @@ function hfcQualityChart(quality){
  return '<div class="hfc-countchart">'+rows.map((r,i)=>'<div class="hfc-countrow"><div class="hfc-countlabel"><span>'+esc(r.label)+'</span><b>'+fmt(r.count)+' รายการ</b></div><div class="hfc-counttrack"><div class="hfc-countfill" style="width:'+(r.count?Math.max(2,100*r.count/max).toFixed(1):0)+'%;background:'+(i===0?'#c7a36e':i%2?'#65ab98':'#93bfae')+'"></div></div></div>').join('')+'</div><p class="hfc-chart-note">นับช่องข้อมูลที่ยังไม่ครบตามกฎเดิม • แต่ละรายการอาจซ้ำกันในระเบียนเดียว ห้ามรวมเป็นจำนวนผู้ป่วย</p>';
 }
 
+
+/* Aggregated client-only review charts. Authenticated paginated records; no patient rows rendered or stored. */
+function hfcCreateReviewAccumulator(){
+ return {visits:0,limitations:[0,0,0,0],assessed:0,appropriate:0,inappropriate:0,pending:0,phenotypes:{HFrEF:{good:0,bad:0},HFpEF:{good:0,bad:0}}};
+}
+function hfcApplyReviewRows(out,rows){
+ const cols=['I','L','O','R'];
+ (Array.isArray(rows)?rows:[]).forEach(row=>{
+  const v=row&&row.values||{},hn=String(v.D??'').trim();
+  if(!hn)return;
+  out.visits++;
+  cols.forEach((c,i)=>{if(String(v[c]??'').trim()==='ข้อจำกัด')out.limitations[i]++;});
+  const assessment=String(v.BB??'').trim(),phen=String(v.AU??'').trim();
+  if(assessment==='เหมาะสม'){out.appropriate++;out.assessed++;if(out.phenotypes[phen])out.phenotypes[phen].good++;}
+  else if(assessment==='ไม่เหมาะสม'){out.inappropriate++;out.assessed++;if(out.phenotypes[phen])out.phenotypes[phen].bad++;}
+  else out.pending++;
+ });
+ return out;
+}
+async function hfcFetchReviewSummary(filters,version){
+ const result=hfcCreateReviewAccumulator(),f={start:filters?.start||'',end:filters?.end||'',clinic:filters?.clinic||'ทั้งหมด',query:''},batch=250;
+ const maxPages=45;
+ for(let page=1;page<=maxPages;page++){
+  if(version!==state.requestVersion||state.view!=='dashboard')return null;
+  const response=await api('listRecords','HF_Patient_Data',f,page,batch);
+  if(version!==state.requestVersion||state.view!=='dashboard')return null;
+  if(!response||!Array.isArray(response.rows))throw new Error('รูปแบบข้อมูลทะเบียนที่เซิร์ฟเวอร์ส่งกลับไม่ถูกต้อง');
+  hfcApplyReviewRows(result,response.rows);
+  const expectedPages=Number(response.pages)||Math.ceil((Number(response.total)||0)/(Number(response.pageSize)||response.rows.length||batch))||1;
+  if(page>=expectedPages)return result;
+  if(!response.rows.length)throw new Error('ได้รับข้อมูลไม่ครบจากระบบทะเบียน');
+ }
+ throw new Error('จำนวนระเบียนมากเกินขอบเขตโหลดสำหรับหน้า Dashboard กรุณาลดช่วงวันที่');
+}
+function hfcConstraintReviewChart(summary){
+ if(!summary||!summary.visits)return hfcEmpty('ไม่พบระเบียนที่มี HN ในช่วงวันที่หรือคลินิกนี้');
+ const titles=['ACEi/ARB/ARNI','β-blocker','MRA','SGLT2i'],m=Math.max(1,...summary.limitations);
+ return '<div role="img" aria-label="กราฟแท่งจำนวนข้อจำกัดในการใช้ยา GDMT แยก 4 กลุ่ม">'
+  +titles.map((label,i)=>{const n=summary.limitations[i],w=100*n/m;return '<div class="hfc-review-row"><div class="hfc-review-label"><span>'+esc(label)+'</span><strong>'+fmt(n)+' ครั้ง</strong></div><div class="hfc-review-track"><div class="hfc-review-fill" style="width:'+w.toFixed(1)+'%"></div></div></div>';}).join('')
+  +'</div><div class="hfc-review-footer">นับสถานะ “ข้อจำกัด” ในคอลัมน์ I, L, O, R ของทะเบียน • หน่วยเป็นจำนวนรายการกลุ่มยาต่อครั้งรับบริการ • ผู้ป่วยรายหนึ่งอาจมีข้อจำกัดหลายกลุ่ม • การมีข้อจำกัดไม่ได้หมายความว่าใช้ยาไม่เหมาะสม</div>';
+}
+function hfcGdmtAppropriatenessChart(summary){
+ if(!summary||!summary.visits)return hfcEmpty('ไม่พบระเบียนที่มี HN ในช่วงวันที่หรือคลินิกนี้');
+ const valid=summary.assessed,share=valid?100*summary.appropriate/valid:null,all=summary.visits,ok=100*summary.appropriate/all,checked=100*valid/all;
+ const draw='<div class="hfc-review-layout"><div class="hfc-review-donut" role="img" aria-label="ผลการประเมินความเหมาะสมตาม GDMT" style="--hfc-ok:'+ok.toFixed(2)+'%;--hfc-checked:'+checked.toFixed(2)+'%"><div class="hfc-review-donut-inner"><b>'+(share===null?'—':esc(percent(share)))+'</b><small>เหมาะสม / ที่ประเมิน</small></div></div>'
+ +'<div class="hfc-review-breakdown"><div class="entry"><span><i class="hfc-dot" style="background:#148d6f"></i> เหมาะสม</span><b>'+fmt(summary.appropriate)+'</b></div><div class="entry"><span><i class="hfc-dot" style="background:#cf9364"></i> ไม่เหมาะสม</span><b>'+fmt(summary.inappropriate)+'</b></div><div class="entry"><span><i class="hfc-dot" style="background:#e9eeeb"></i> ยังไม่ประเมิน</span><b>'+fmt(summary.pending)+'</b></div></div></div>';
+ const ph=Object.entries(summary.phenotypes).map(([label,v])=>{const n=v.good+v.bad;return '<div class="ph"><span>'+esc(label)+' · ประเมินแล้ว '+fmt(n)+'</span><b>'+(n?esc(percent(100*v.good/n)):'—')+'</b><span>เหมาะสม '+fmt(v.good)+' / '+fmt(n)+'</span></div>';}).join('');
+ return draw+'<div class="hfc-review-subheading">ความเหมาะสมในรายที่ประเมินแล้ว แยกตาม HF phenotype</div><div class="hfc-review-pheno">'+ph+'</div>'
+  +'<div class="hfc-review-footer">ข้อมูลมาจากคอลัมน์ BB “ประเมินความเหมาะสมตาม GDMT” ตามการบันทึกจริง • ร้อยละเหมาะสม = เหมาะสม ÷ (เหมาะสม + ไม่เหมาะสม) • ยังไม่ประเมินไม่ถูกนำเข้าตัวหาร • ไม่ใช่เกณฑ์เดียวกับการได้รับยา GDMT หรือ maximum tolerated dose</div>';
+}
+async function hfcLoadReviewCharts(version,filters){
+ const targets=[document.getElementById('hfcContraindications'),document.getElementById('hfcGdmtAppropriateness')];
+ if(targets.some(t=>!t))return;
+ try{
+  const data=await hfcFetchReviewSummary(filters,version);
+  if(!data||version!==state.requestVersion||state.view!=='dashboard')return;
+  const a=document.getElementById('hfcContraindications'),b=document.getElementById('hfcGdmtAppropriateness');
+  if(a)a.innerHTML=hfcConstraintReviewChart(data);
+  if(b)b.innerHTML=hfcGdmtAppropriatenessChart(data);
+ }catch(e){
+  if(version!==state.requestVersion||state.view!=='dashboard')return;
+  const message='<div class="hfc-review-status"><strong>ยังไม่สามารถโหลดข้อมูลการประเมินได้</strong>ตรวจสอบสิทธิ์บัญชี/การเชื่อมต่อ Apps Script แล้วกดรีเฟรช Dashboard • '+esc(String(e.message||'เกิดข้อผิดพลาด'))+'</div>';
+  for(const id of ['hfcContraindications','hfcGdmtAppropriateness']){const node=document.getElementById(id);if(node)node.innerHTML=message;}
+ }
+}
+
 function dashboardHTML(d){const n=d.total;return heading('ภาพรวมคลินิกหัวใจล้มเหลว','ติดตามคุณภาพการใช้ยา ความปลอดภัย และผลลัพธ์ของผู้ป่วย', '<button id="newPatient" class="btn btn-primary">'+icon('plus')+'บันทึกผู้ป่วย</button>')+toolbar()+
  '<section class="hero"><div><div class="eyebrow">CARE THAT MAKES A DIFFERENCE</div><h2>ทุกข้อมูล เชื่อมต่อการดูแลที่ดีขึ้น</h2><p>'+esc(state.boot.organization)+' · '+dateTH(d.filters.start)+' ถึง '+dateTH(d.filters.end)+'</p><div class="hero-badge"><i></i>CONNECTED CARE NETWORK</div></div>'+hologram()+'<div class="hero-right"><div class="hero-stat"><div class="value mono">'+fmt(d.patientCount)+'</div><div class="label">ผู้ป่วย HN ไม่ซ้ำ</div></div><div class="hero-divider"></div><div class="hero-stat"><div class="value mono">'+fmt(d.eligibleComplete)+'<span style="font-size:16px;color:#89a697"> / '+fmt(d.eligibleCount)+'</span></div><div class="label">HFrEF ครบ FMT ตาม eligibility · ครั้งบริการ</div></div></div><svg class="hero-heart" viewBox="0 0 200 100" fill="none" stroke="white" stroke-width="6"><path d="M0 50h35l15-30 25 60 25-55 17 25h83"/></svg></section>'+
  '<div class="stats">'+metric('ครั้งรับบริการทั้งหมด',fmt(n),'ผู้ป่วย '+fmt(d.patientCount)+' ราย','users')+metric('New case',fmt(d.newVisits),'HN ไม่ซ้ำ '+fmt(d.newPatients)+' ราย','plus')+metric('ครั้งบริการที่พบ DRP',fmt(d.drpVisits),'DRP Log '+fmt(d.drpEvents)+' เหตุการณ์','activity')+metric('DRP resolution',percent(d.drpResolution),fmt(d.drpResolvedVisits)+' / '+fmt(d.drpVisits)+' ครั้งที่พบ DRP','check')+metric('Readmission 30 วัน',percent(d.readmission),fmt(d.readmissionCount)+' / '+fmt(n)+' ครั้งบริการ','heart')+metric('KCCQ-12 เฉลี่ย',fmt(d.kccq.value), 'มีผลประเมิน '+fmt(d.kccq.n)+' ครั้ง · 0–100','chart')+'</div>'+
@@ -1130,6 +1225,7 @@ function dashboardHTML(d){const n=d.total;return heading('ภาพรวมค�
  '<div class="grid grid-wide">'+panel('การใช้ยาตามมาตรฐาน GDMT · HFrEF','Eligible-adjusted: ใช่ ÷ (ใช่ + ไม่ใช่) · “ข้อจำกัด” ไม่อยู่ในตัวหาร',bars(d.gdmt,{total:true}),'ELIGIBLE-ADJUSTED')+panel('แนวโน้มการเข้ารับบริการ',d.trendMode==='daily'?'จำนวนครั้งรับบริการตามวันในช่วงที่เลือก':'จำนวนครั้งรับบริการตามเดือนในช่วงที่เลือก',trendChart(d.trend),d.trendMode==='daily'?'DAILY TREND':'MONTHLY TREND')+'</div>'+
  '<div class="grid">'+panel('HFrEF · FMT score','จำนวนกลุ่มที่ใช้ยา ÷ จำนวนกลุ่มที่ eligible เช่น 2/2, 3/3, 4/4 · “ข้อจำกัด” ตัดออกจาก denominator',scoreRing(d),'ELIGIBLE-ADJUSTED')+panel('HFrEF · ช่องว่าง FMT','นับเฉพาะสถานะ “ไม่ใช่” เป็น gap · “ข้อจำกัด” ไม่เป็น gap และไม่อยู่ใน denominator',bars(d.gap)+'<div class="panel-foot"><span>HFpEF ครบ MRA + SGLT2i</span><strong>'+fmt(d.hfpComplete)+' / '+fmt(d.hfpCount)+' ครั้ง</strong></div>','FMT GAP')+'</div>'+
  '<div class="grid">'+panel('กราฟจำนวน DRP ที่พบตามประเภท','จัดเรียงจากจำนวนเหตุการณ์มากไปน้อย',hfcEventBars(d.drpTypes),'DRP FREQUENCY')+panel('กราฟ ADR Type A และ Preventable','จำนวนเหตุการณ์ที่บันทึก เทียบกับ ADR events ทั้งหมด',hfcAdrSafety(d),'ADR SAFETY')+'</div>'+
+ '<div class="hfc-new-section"><div class="section-label"><h2>ข้อจำกัดและความเหมาะสมตามแนวทาง GDMT</h2><span>ข้อมูลสถานะการใช้ยาและการประเมินจากทะเบียนผู้ป่วย</span></div></div><div class="grid">'+panel('ข้อจำกัดในการใช้ยา GDMT แยกกลุ่ม','สถานะข้อจำกัดที่บันทึกจริงใน 4 กลุ่มยา','<div id="hfcContraindications" class="hfc-review-status">กำลังโหลดจำนวนข้อจำกัดตามตัวกรองที่เลือก…</div>','GDMT LIMITATIONS')+panel('การประเมินความเหมาะสมตาม GDMT','เหมาะสม / ไม่เหมาะสม / ยังไม่ประเมิน','<div id="hfcGdmtAppropriateness" class="hfc-review-status">กำลังโหลดผลประเมินตามตัวกรองที่เลือก…</div>','GDMT APPROPRIATENESS')+'</div>'+
  '<div class="section-label"><h2>ความปลอดภัยและการแก้ไขปัญหา</h2><span>วิเคราะห์จากทะเบียนเหตุการณ์</span></div><div class="grid">'+panel('DRP แยกตามประเภท',fmt(d.drpEvents)+' เหตุการณ์ · แยก 1 แถวต่อ 1 DRP',bars(d.drpTypes),'DRP LOG')+panel('ADR แยกตามกลุ่มยา',fmt(d.adrEvents)+' เหตุการณ์ · Type A '+fmt(d.typeAEvents)+' · Preventable '+fmt(d.preventableEvents),bars(d.adrGroups),'ADR LOG')+'</div>'+
  '<div class="grid">'+panel('แผนการแก้ไขปัญหา DRP','แผนหลักที่บันทึกในแต่ละเหตุการณ์',bars(d.interventions),'INTERVENTIONS')+panel('ผลการแก้ไขปัญหา DRP','สถานะผลลัพธ์ในทะเบียน DRP',bars(d.outcomes)+'<div class="panel-foot"><span>สำเร็จ / เหตุการณ์ทั้งหมด '+percent(d.drpEventResolution)+'</span><strong>HN สำเร็จ / HN พบ DRP '+percent(d.drpPatientResolution)+'</strong></div>','OUTCOMES')+'</div>'+
  '<div class="grid">'+panel('ผลลัพธ์ทางคลินิก','ตัวหารเป็นครั้งบริการตาม Dashboard ต้นฉบับ','<div class="mini-list"><div class="mini-row"><span>Readmission HF ภายใน 30 วัน</span><strong>'+percent(d.readmission)+'</strong></div><div class="mini-row"><span>เสียชีวิตจาก HF</span><strong>'+percent(d.mortality)+'</strong></div><div class="mini-row"><span>KCCQ-12 เฉลี่ย ('+d.kccq.n+' ครั้ง)</span><strong>'+fmt(d.kccq.value)+'</strong></div><div class="mini-row"><span>ความพึงพอใจเฉลี่ย ('+d.satisfaction.n+' ครั้ง)</span><strong>'+fmt(d.satisfaction.value)+' / 5</strong></div><div class="mini-row"><span>ADR Type A · เหตุการณ์ที่ประเมินว่าใช่</span><strong>'+fmt(d.typeAEvents)+'</strong></div><div class="mini-row"><span>Preventable ADR · ประเมินแยกจาก Type A</span><strong>'+fmt(d.preventableEvents)+'</strong></div></div>','CLINICAL / SAFETY')+panel('การยอมรับคำแนะนำ','การตอบรับ Pharmacist Intervention',bars(d.acceptance),'ACCEPTANCE')+'</div>'+
@@ -1169,7 +1265,7 @@ function reportHTML(d){const r=state.report,fields=r.fields;return heading('ร�
 function printPage(){document.querySelectorAll('input,select,textarea').forEach(el=>{const mirror=el.parentElement.querySelector('.print-mirror');if(mirror)mirror.textContent=el.type==='date'?dateTH(el.value):el.value;});if($('dashboardSummary')){let mirror=$('dashboardSummary').parentElement.querySelector('.print-mirror');if(!mirror){mirror=document.createElement('div');mirror.className='print-mirror';$('dashboardSummary').after(mirror);}mirror.textContent=$('dashboardSummary').value;}window.print();}
 function navRender(){ $('nav').innerHTML=navigation.filter(([key])=>(key!=='users'||currentUser?.role==='admin')).map(([key,label,ico])=>(key==='report'?'<div class="nav-caption" style="margin-top:20px">INSIGHTS & RESOURCES</div>':'')+'<button class="nav-btn '+(state.view===key?'active':'')+'" data-view="'+key+'">'+icon(ico)+esc(label)+'</button>').join('');$('nav').querySelectorAll('.nav-btn[data-view]').forEach(b=>b.onclick=()=>navigate(b.dataset.view)); }
 async function navigate(view){if(state.reportDirty&&!confirm('รายงานมีข้อมูลที่ยังไม่บันทึก ต้องการออกจากหน้านี้หรือไม่?'))return;state.reportDirty=false;state.view=view;state.page=1;setNavigationOpen(false);navRender();$('crumb').textContent=navigation.find(n=>n[0]===view)[1];await loadView();window.scrollTo({top:0,behavior:'smooth'});}
-async function loadView(silent){silent=silent===true;const version=++state.requestVersion,view=state.view;document.body.dataset.view=view;if(!silent)$('page').innerHTML='<div class="loading-text">กำลังโหลดข้อมูลจาก '+BACKEND_NAME+'…</div><div class="loading-grid">'+Array(6).fill('<div class="skeleton"></div>').join('')+'</div>';try{if(view===VISIT_SHEET&&!state.boot.schemas[VISIT_SHEET]){$('page').innerHTML=visitUnavailableHTML();return;}if(view==='executive'||view==='users'){await loadExtendedView(view,version);applyAccessUI();return;}if(view==='dashboard'){const d=await api('getDashboard',state.filters);if(version!==state.requestVersion)return;state.dash=d;$('page').innerHTML=dashboardHTML(d);bindToolbar();$('newPatient').onclick=()=>openNewPatient();document.querySelectorAll('.overdue-open').forEach(b=>b.onclick=()=>openRecord('HF_Patient_Data',+b.dataset.row));$('dashboardSummary').oninput=()=>{state.summaryDirty=true;};$('saveSummary').onclick=async()=>{const btn=$('saveSummary');btn.disabled=true;try{await api('saveDashboardSummary',$('dashboardSummary').value,d.summary);state.summaryDirty=false;toast('บันทึกสรุปผลใน '+BACKEND_NAME+' แล้ว');await loadView();}catch(e){toast(e.message,true);}finally{btn.disabled=false;}};$('footerStatus').textContent='อัปเดต '+d.updatedAt;}
+async function loadView(silent){silent=silent===true;const version=++state.requestVersion,view=state.view;document.body.dataset.view=view;if(!silent)$('page').innerHTML='<div class="loading-text">กำลังโหลดข้อมูลจาก '+BACKEND_NAME+'…</div><div class="loading-grid">'+Array(6).fill('<div class="skeleton"></div>').join('')+'</div>';try{if(view===VISIT_SHEET&&!state.boot.schemas[VISIT_SHEET]){$('page').innerHTML=visitUnavailableHTML();return;}if(view==='executive'||view==='users'){await loadExtendedView(view,version);applyAccessUI();return;}if(view==='dashboard'){const d=await api('getDashboard',state.filters);if(version!==state.requestVersion)return;state.dash=d;$('page').innerHTML=dashboardHTML(d);bindToolbar();void hfcLoadReviewCharts(version,d.filters||state.filters);$('newPatient').onclick=()=>openNewPatient();document.querySelectorAll('.overdue-open').forEach(b=>b.onclick=()=>openRecord('HF_Patient_Data',+b.dataset.row));$('dashboardSummary').oninput=()=>{state.summaryDirty=true;};$('saveSummary').onclick=async()=>{const btn=$('saveSummary');btn.disabled=true;try{await api('saveDashboardSummary',$('dashboardSummary').value,d.summary);state.summaryDirty=false;toast('บันทึกสรุปผลใน '+BACKEND_NAME+' แล้ว');await loadView();}catch(e){toast(e.message,true);}finally{btn.disabled=false;}};$('footerStatus').textContent='อัปเดต '+d.updatedAt;}
  else if(view==='references'){const fresh=await api('getBootstrap');if(version!==state.requestVersion)return;state.boot=fresh;$('page').innerHTML=referenceHTML();document.querySelectorAll('[data-reference]').forEach(b=>b.onclick=()=>{state.reference=b.dataset.reference;loadView();});$('printReference').onclick=printPage;}
  else if(view==='report'){const [report,d]=await Promise.all([api('getReport'),api('getDashboard',state.filters)]);if(version!==state.requestVersion)return;state.report=report;state.dash=d;report.fields.start=state.filters.start||report.fields.start;report.fields.end=state.filters.end||report.fields.end;report.fields.clinic=state.filters.clinic;$('page').innerHTML=reportHTML(d);bindToolbar();$('printReport').onclick=printPage;document.querySelectorAll('[data-report],.report-note').forEach(el=>el.oninput=()=>{state.reportDirty=true;});bindReportRange();bindReportSave();}
  else {const data=await api('listRecords',view,state.filters,state.page,10);if(version!==state.requestVersion)return;state.table=data;$('page').innerHTML=recordTableHTML(view,data);bindToolbar();$('newRecord').onclick=()=>openRecord(view);if($('syncVisits'))$('syncVisits').onclick=syncVisits;document.querySelectorAll('.edit-record').forEach(b=>b.onclick=()=>openRecord(view,+b.dataset.row));$('prevPage').onclick=()=>{state.page=data.page-1;loadView();};$('nextPage').onclick=()=>{state.page=data.page+1;loadView();};}
