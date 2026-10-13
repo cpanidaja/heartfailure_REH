@@ -1192,37 +1192,53 @@ function hfcQualityChart(quality){
 
 
 /* Aggregated client-only review charts. Authenticated paginated records; no patient rows rendered or stored. */
+/* Live GDMT review: HF_Patient_Data!BB only, never the Executive_Dashboard snapshot. */
 function hfcCreateReviewAccumulator(){
- return {visits:0,limitations:[0,0,0,0],assessed:0,appropriate:0,inappropriate:0,pending:0,phenotypes:{HFrEF:{good:0,bad:0},HFpEF:{good:0,bad:0}}};
+ return {source:'HF_Patient_Data',field:'BB',visits:0,rowsReceived:0,bbDetected:false,limitations:[0,0,0,0],assessed:0,appropriate:0,inappropriate:0,pending:0,unrecognized:0,phenotypes:{HFrEF:{good:0,bad:0},HFpEF:{good:0,bad:0}}};
 }
 function hfcApplyReviewRows(out,rows){
  const cols=['I','L','O','R'];
  (Array.isArray(rows)?rows:[]).forEach(row=>{
   const v=row&&row.values||{},hn=String(v.D??'').trim();
+  out.rowsReceived++;
+  if(Object.prototype.hasOwnProperty.call(v,'BB'))out.bbDetected=true;
   if(!hn)return;
   out.visits++;
   cols.forEach((c,i)=>{if(String(v[c]??'').trim()==='ข้อจำกัด')out.limitations[i]++;});
   const assessment=String(v.BB??'').trim(),phen=String(v.AU??'').trim();
   if(assessment==='เหมาะสม'){out.appropriate++;out.assessed++;if(out.phenotypes[phen])out.phenotypes[phen].good++;}
   else if(assessment==='ไม่เหมาะสม'){out.inappropriate++;out.assessed++;if(out.phenotypes[phen])out.phenotypes[phen].bad++;}
-  else out.pending++;
+  else {out.pending++;if(assessment!=='')out.unrecognized++;}
  });
  return out;
 }
 async function hfcFetchReviewSummary(filters,version){
- const result=hfcCreateReviewAccumulator(),f={start:filters?.start||'',end:filters?.end||'',clinic:filters?.clinic||'ทั้งหมด',query:''},batch=250;
- const maxPages=45;
+ const result=hfcCreateReviewAccumulator();
+ const f={start:filters?.start||'',end:filters?.end||'',clinic:filters?.clinic||'ทั้งหมด',query:''};
+ const maxPages=45,requestedBatch=200;
+ let totalExpected=null,reportedPages=1,observedBatch=0;
  for(let page=1;page<=maxPages;page++){
   if(version!==state.requestVersion||state.view!=='dashboard')return null;
-  const response=await api('listRecords','HF_Patient_Data',f,page,batch);
+  const response=await api('listRecords','HF_Patient_Data',f,page,requestedBatch);
   if(version!==state.requestVersion||state.view!=='dashboard')return null;
-  if(!response||!Array.isArray(response.rows))throw new Error('รูปแบบข้อมูลทะเบียนที่เซิร์ฟเวอร์ส่งกลับไม่ถูกต้อง');
+  if(!response||!Array.isArray(response.rows))throw new Error('เซิร์ฟเวอร์ไม่ส่งข้อมูลระเบียน HF_Patient_Data ตามรูปแบบที่รองรับ');
+  if(Number.isFinite(Number(response.total))&&response.total!==''&&response.total!==null)totalExpected=Number(response.total);
+  if(Number(response.pages)>0)reportedPages=Number(response.pages);
+  if(page===1)observedBatch=Math.max(1,Number(response.pageSize)||response.rows.length||requestedBatch);
   hfcApplyReviewRows(result,response.rows);
-  const expectedPages=Number(response.pages)||Math.ceil((Number(response.total)||0)/(Number(response.pageSize)||response.rows.length||batch))||1;
-  if(page>=expectedPages)return result;
-  if(!response.rows.length)throw new Error('ได้รับข้อมูลไม่ครบจากระบบทะเบียน');
+  if(!response.rows.length){
+   if(totalExpected!==null&&result.rowsReceived<totalExpected)throw new Error('ดึงข้อมูลทะเบียนมาไม่ครบ: '+result.rowsReceived+' / '+totalExpected+' ระเบียน');
+   break;
+  }
+  const expectedPages=Math.max(reportedPages,totalExpected===null?1:Math.ceil(totalExpected/observedBatch));
+  if(page>=expectedPages){
+   if(totalExpected!==null&&result.rowsReceived<totalExpected)throw new Error('ดึงข้อมูลทะเบียนมาไม่ครบ: '+result.rowsReceived+' / '+totalExpected+' ระเบียน');
+   break;
+  }
+  if(page===maxPages)throw new Error('ข้อมูลมากเกินช่วงโหลดของ Dashboard กรุณาจำกัดวันที่');
  }
- throw new Error('จำนวนระเบียนมากเกินขอบเขตโหลดสำหรับหน้า Dashboard กรุณาลดช่วงวันที่');
+ if(result.visits>0&&!result.bbDetected)throw new Error('Google Apps Script ยังไม่ส่งคอลัมน์ BB ของ HF_Patient_Data โปรดอัปเดต backend schema ก่อนสรุปผล GDMT');
+ return result;
 }
 function hfcConstraintReviewChart(summary){
  if(!summary||!summary.visits)return hfcEmpty('ไม่พบระเบียนที่มี HN ในช่วงวันที่หรือคลินิกนี้');
@@ -1234,11 +1250,11 @@ function hfcConstraintReviewChart(summary){
 function hfcGdmtAppropriatenessChart(summary){
  if(!summary||!summary.visits)return hfcEmpty('ไม่พบระเบียนที่มี HN ในช่วงวันที่หรือคลินิกนี้');
  const valid=summary.assessed,share=valid?100*summary.appropriate/valid:null,all=summary.visits,ok=100*summary.appropriate/all,checked=100*valid/all;
- const draw='<div class="hfc-review-layout"><div class="hfc-review-donut" role="img" aria-label="ผลการประเมินความเหมาะสมตาม GDMT" style="--hfc-ok:'+ok.toFixed(2)+'%;--hfc-checked:'+checked.toFixed(2)+'%"><div class="hfc-review-donut-inner"><b>'+(share===null?'—':esc(percent(share)))+'</b><small>เหมาะสม / ที่ประเมิน</small></div></div>'
+ const draw='<div class="hfc-review-head" style="font-size:11px;color:var(--muted);margin-bottom:12px"><strong style="color:var(--teal)">HF_Patient_Data · คอลัมน์ BB</strong> · อ่านข้อมูลล่าสุดจาก Google Sheets · '+fmt(all)+' ระเบียน · ประเมินแล้ว '+fmt(valid)+' · ยังไม่ประเมิน '+fmt(summary.pending)+'</div><div class="hfc-review-layout"><div class="hfc-review-donut" role="img" aria-label="ผลการประเมินความเหมาะสมตาม GDMT" style="--hfc-ok:'+ok.toFixed(2)+'%;--hfc-checked:'+checked.toFixed(2)+'%"><div class="hfc-review-donut-inner"><b>'+(share===null?'—':esc(percent(share)))+'</b><small>เหมาะสม / ที่ประเมิน</small></div></div>'
  +'<div class="hfc-review-breakdown"><div class="entry"><span><i class="hfc-dot" style="background:#148d6f"></i> เหมาะสม</span><b>'+fmt(summary.appropriate)+'</b></div><div class="entry"><span><i class="hfc-dot" style="background:#cf9364"></i> ไม่เหมาะสม</span><b>'+fmt(summary.inappropriate)+'</b></div><div class="entry"><span><i class="hfc-dot" style="background:#e9eeeb"></i> ยังไม่ประเมิน</span><b>'+fmt(summary.pending)+'</b></div></div></div>';
  const ph=Object.entries(summary.phenotypes).map(([label,v])=>{const n=v.good+v.bad;return '<div class="ph"><span>'+esc(label)+' · ประเมินแล้ว '+fmt(n)+'</span><b>'+(n?esc(percent(100*v.good/n)):'—')+'</b><span>เหมาะสม '+fmt(v.good)+' / '+fmt(n)+'</span></div>';}).join('');
  return draw+'<div class="hfc-review-subheading">ความเหมาะสมในรายที่ประเมินแล้ว แยกตาม HF phenotype</div><div class="hfc-review-pheno">'+ph+'</div>'
-  +'<div class="hfc-review-footer">ข้อมูลมาจากคอลัมน์ BB “ประเมินความเหมาะสมตาม GDMT” ตามการบันทึกจริง • ร้อยละเหมาะสม = เหมาะสม ÷ (เหมาะสม + ไม่เหมาะสม) • ยังไม่ประเมินไม่ถูกนำเข้าตัวหาร • ไม่ใช่เกณฑ์เดียวกับการได้รับยา GDMT หรือ maximum tolerated dose</div>';
+  +'<div class="hfc-review-footer">ข้อมูลสดจาก HF_Patient_Data!BB (หลังเข้าสู่ระบบ) • นับตามระเบียนที่มี HN ในช่วงวันที่/คลินิกที่เลือก • เหมาะสม ÷ (เหมาะสม + ไม่เหมาะสม) • ไม่รวมที่ยังไม่ประเมินในตัวหาร • แยกจาก GDMT prescribing และ MTD</div>';
 }
 async function hfcLoadReviewCharts(version,filters){
  const targets=[document.getElementById('hfcContraindications'),document.getElementById('hfcGdmtAppropriateness')];
@@ -1293,7 +1309,7 @@ function dashboardHTML(d){const n=d.total;return heading('ภาพรวมค�
  '<div class="grid grid-wide">'+panel('การใช้ยาตามมาตรฐาน GDMT · HFrEF','Eligible-adjusted: ใช่ ÷ (ใช่ + ไม่ใช่) · “ข้อจำกัด” ไม่อยู่ในตัวหาร',bars(d.gdmt,{total:true}),'ELIGIBLE-ADJUSTED')+panel('แนวโน้มการเข้ารับบริการ',d.trendMode==='daily'?'จำนวนครั้งรับบริการตามวันในช่วงที่เลือก':'จำนวนครั้งรับบริการตามเดือนในช่วงที่เลือก',trendChart(d.trend),d.trendMode==='daily'?'DAILY TREND':'MONTHLY TREND')+'</div>'+
  '<div class="grid">'+panel('HFrEF · FMT score','จำนวนกลุ่มที่ใช้ยา ÷ จำนวนกลุ่มที่ eligible เช่น 2/2, 3/3, 4/4 · “ข้อจำกัด” ตัดออกจาก denominator',scoreRing(d),'ELIGIBLE-ADJUSTED')+panel('HFrEF · ช่องว่าง FMT','นับเฉพาะสถานะ “ไม่ใช่” เป็น gap · “ข้อจำกัด” ไม่เป็น gap และไม่อยู่ใน denominator',bars(d.gap)+'<div class="panel-foot"><span>HFpEF ครบ MRA + SGLT2i</span><strong>'+fmt(d.hfpComplete)+' / '+fmt(d.hfpCount)+' ครั้ง</strong></div>','FMT GAP')+'</div>'+
  '<div class="grid">'+panel('กราฟจำนวน DRP ที่พบตามประเภท','จัดเรียงจากจำนวนเหตุการณ์มากไปน้อย',hfcEventBars(d.drpTypes),'DRP FREQUENCY')+panel('กราฟ ADR Type A และ Preventable','จำนวนเหตุการณ์ที่บันทึก เทียบกับ ADR events ทั้งหมด',hfcAdrSafety(d),'ADR SAFETY')+'</div>'+
- '<div class="hfc-new-section"><div class="section-label"><h2>ข้อจำกัดและความเหมาะสมตามแนวทาง GDMT</h2><span>ข้อมูลสถานะการใช้ยาและการประเมินจากทะเบียนผู้ป่วย</span></div></div><div class="grid">'+panel('ข้อจำกัดในการใช้ยา GDMT แยกกลุ่ม','สถานะข้อจำกัดที่บันทึกจริงใน 4 กลุ่มยา','<div id="hfcContraindications" class="hfc-review-status">กำลังโหลดจำนวนข้อจำกัดตามตัวกรองที่เลือก…</div>','GDMT LIMITATIONS')+panel('การประเมินความเหมาะสมตาม GDMT','เหมาะสม / ไม่เหมาะสม / ยังไม่ประเมิน','<div id="hfcGdmtAppropriateness" class="hfc-review-status">กำลังโหลดผลประเมินตามตัวกรองที่เลือก…</div>','GDMT APPROPRIATENESS')+'</div>'+
+ '<div class="hfc-new-section"><div class="section-label"><h2>ข้อจำกัดและความเหมาะสมตามแนวทาง GDMT</h2><span>ข้อมูลสถานะการใช้ยาและการประเมินจากทะเบียนผู้ป่วย</span></div></div><div class="grid">'+panel('ข้อจำกัดในการใช้ยา GDMT แยกกลุ่ม','สถานะข้อจำกัดที่บันทึกจริงใน 4 กลุ่มยา','<div id="hfcContraindications" class="hfc-review-status">กำลังโหลดจำนวนข้อจำกัดตามตัวกรองที่เลือก…</div>','GDMT LIMITATIONS')+panel('การประเมินความเหมาะสมตาม GDMT · HF_Patient_Data','ผลจากคอลัมน์ BB: เหมาะสม / ไม่เหมาะสม / ยังไม่ประเมิน (ข้อมูลสด)','<div id="hfcGdmtAppropriateness" class="hfc-review-status">กำลังโหลดผลประเมินตามตัวกรองที่เลือก…</div>','GDMT APPROPRIATENESS')+'</div>'+
  '<div class="section-label"><h2>ความปลอดภัยและการแก้ไขปัญหา</h2><span>วิเคราะห์จากทะเบียนเหตุการณ์</span></div><div class="grid">'+panel('DRP แยกตามประเภท',fmt(d.drpEvents)+' เหตุการณ์ · แยก 1 แถวต่อ 1 DRP',bars(d.drpTypes),'DRP LOG')+panel('ADR แยกตามกลุ่มยา',fmt(d.adrEvents)+' เหตุการณ์ · Type A '+fmt(d.typeAEvents)+' · Preventable '+fmt(d.preventableEvents),bars(d.adrGroups),'ADR LOG')+'</div>'+
  '<div class="grid">'+panel('แผนการแก้ไขปัญหา DRP','แผนหลักที่บันทึกในแต่ละเหตุการณ์',bars(d.interventions),'INTERVENTIONS')+panel('ผลการแก้ไขปัญหา DRP','สถานะผลลัพธ์ในทะเบียน DRP',bars(d.outcomes)+'<div class="panel-foot"><span>สำเร็จ / เหตุการณ์ทั้งหมด '+percent(d.drpEventResolution)+'</span><strong>HN สำเร็จ / HN พบ DRP '+percent(d.drpPatientResolution)+'</strong></div>','OUTCOMES')+'</div>'+
  '<div class="grid">'+panel('ผลลัพธ์ทางคลินิก','ตัวหารเป็นครั้งบริการตาม Dashboard ต้นฉบับ','<div class="mini-list"><div class="mini-row"><span>Readmission HF ภายใน 30 วัน</span><strong>'+percent(d.readmission)+'</strong></div><div class="mini-row"><span>เสียชีวิตจาก HF</span><strong>'+percent(d.mortality)+'</strong></div><div class="mini-row"><span>KCCQ-12 เฉลี่ย ('+d.kccq.n+' ครั้ง)</span><strong>'+fmt(d.kccq.value)+'</strong></div><div class="mini-row"><span>ความพึงพอใจเฉลี่ย ('+d.satisfaction.n+' ครั้ง)</span><strong>'+fmt(d.satisfaction.value)+' / 5</strong></div><div class="mini-row"><span>ADR Type A · เหตุการณ์ที่ประเมินว่าใช่</span><strong>'+fmt(d.typeAEvents)+'</strong></div><div class="mini-row"><span>Preventable ADR · ประเมินแยกจาก Type A</span><strong>'+fmt(d.preventableEvents)+'</strong></div></div>','CLINICAL / SAFETY')+panel('การยอมรับคำแนะนำ','การตอบรับ Pharmacist Intervention',bars(d.acceptance),'ACCEPTANCE')+'</div>'+
