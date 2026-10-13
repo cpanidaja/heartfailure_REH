@@ -124,6 +124,10 @@
 }
 @media print{.hfc-execdash-section{break-inside:avoid}.hfc-execdash-classcol,.hfc-execdash-bar{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 
+.hfc-review-backup{border:1px solid #f1dda8;background:#fffbef;color:#73572c;padding:12px 13px;border-radius:11px;line-height:1.7;font-size:11px;margin-bottom:17px}
+.hfc-review-backup strong{display:block;font-size:12px;margin-bottom:3px;color:#835c22}
+.hfc-review-backup b{color:#724819}
+.hfc-review-backup-small{display:block;font-size:10px;margin-top:4px}
 </style>
 <style>
 /* Luminous clinical workspace — pearl, emerald and luminous mint. */
@@ -1193,6 +1197,23 @@ function hfcQualityChart(quality){
 
 /* Aggregated client-only review charts. Authenticated paginated records; no patient rows rendered or stored. */
 /* Live GDMT review: HF_Patient_Data!BB only, never the Executive_Dashboard snapshot. */
+/* Verified aggregate-only fallback from HF_Patient_Data as inspected 2026-10-13.
+   Public GitHub code contains no HNs, names, medications or patient-level records.
+   This is NOT live, and NEVER follows the date/clinic filter. */
+const HFC_GDMT_VERIFIED_SNAPSHOT={
+ source:'HF_Patient_Data',field:'BB',asOf:'13 ต.ค. 2569',readMode:'sheet-snapshot',
+ visits:262,limitations:[41,12,88,154],assessed:197,appropriate:197,inappropriate:0,
+ pending:65,bbDetected:true,constraintsDetected:true,
+ phenotypes:{HFrEF:{good:176,bad:0},HFpEF:{good:17,bad:0}},
+ note:'ข้อมูลทั้งทะเบียน ณ 13 ต.ค. 2569 รวมแถวที่ไม่ได้ระบุวันที่รับบริการและแถวที่เป็นนัดในอนาคต'
+};
+function hfcGdmtBackupNote(reason){
+ return '<div class="hfc-review-backup" role="status"><strong>แสดงข้อมูลสำรองจาก Google Sheets · ไม่ใช่ข้อมูลสด</strong>'
+   +'ข้อมูลทั้งทะเบียนที่ตรวจสอบล่าสุด ณ 13 ต.ค. 2569 <b>ไม่เปลี่ยนตามตัวกรองวันที่/คลินิก</b> · '
+   +'ขณะนี้ Apps Script ยังไม่ส่งฟิลด์ที่จำเป็นให้เว็บไซต์ครบ'
+   +(reason?'<span class="hfc-review-backup-small">'+esc(reason)+'</span>':'')+'</div>';
+}
+
 function hfcCreateReviewAccumulator(){
  return {source:'HF_Patient_Data',field:'BB',visits:0,rowsReceived:0,bbDetected:false,constraintsDetected:false,limitations:[0,0,0,0],assessed:0,appropriate:0,inappropriate:0,pending:0,unrecognized:0,phenotypes:{HFrEF:{good:0,bad:0},HFpEF:{good:0,bad:0}},readMode:'preview'};
 }
@@ -1263,7 +1284,9 @@ async function hfcFetchReviewSummary(filters,version){
   if(detailBB&&detailLimits)break;
  }
  if(!detailBB&&!detailLimits){
-  throw new Error('Apps Script ไม่ส่งคอลัมน์ I, L, O, R และ BB ทั้งในรายการย่อและระเบียนเต็ม จำเป็นต้องปรับ Code.gs ฝั่งเซิร์ฟเวอร์');
+  hfcApplyReviewRows(result,previews);
+  result.readMode='backend-fields-omitted';
+  return result;
  }
  // If preview already contains all limitation statuses, show its chart immediately.
  // An older Apps Script deployment may still omit BB from getRecord; don't block the limitation chart.
@@ -1309,11 +1332,12 @@ function hfcConstraintReviewChart(summary){
 function hfcGdmtAppropriatenessChart(summary){
  if(!summary||!summary.visits)return hfcEmpty('ไม่พบระเบียนที่มี HN ในช่วงวันที่หรือคลินิกนี้');
  const valid=summary.assessed,share=valid?100*summary.appropriate/valid:null,all=summary.visits,ok=100*summary.appropriate/all,checked=100*valid/all;
- const draw='<div class="hfc-review-head" style="font-size:11px;color:var(--muted);margin-bottom:12px"><strong style="color:var(--teal)">HF_Patient_Data · คอลัมน์ BB</strong> · อ่านข้อมูลล่าสุดจาก Google Sheets · '+fmt(all)+' ระเบียน · ประเมินแล้ว '+fmt(valid)+' · ยังไม่ประเมิน '+fmt(summary.pending)+'</div><div class="hfc-review-layout"><div class="hfc-review-donut" role="img" aria-label="ผลการประเมินความเหมาะสมตาม GDMT" style="--hfc-ok:'+ok.toFixed(2)+'%;--hfc-checked:'+checked.toFixed(2)+'%"><div class="hfc-review-donut-inner"><b>'+(share===null?'—':esc(percent(share)))+'</b><small>เหมาะสม / ที่ประเมิน</small></div></div>'
+ const isBackup=summary.readMode==='sheet-snapshot';
+ const draw='<div class="hfc-review-head" style="font-size:11px;color:var(--muted);margin-bottom:12px"><strong style="color:var(--teal)">HF_Patient_Data · คอลัมน์ BB</strong> · '+(isBackup?'ข้อมูลสำรอง ณ '+esc(summary.asOf)+' · ทั้งทะเบียน (ไม่ตามตัวกรอง)':'ข้อมูลสดจาก Google Sheets')+' · '+fmt(all)+' ระเบียน · ประเมินแล้ว '+fmt(valid)+' · ยังไม่ประเมิน '+fmt(summary.pending)+'</div><div class="hfc-review-layout"><div class="hfc-review-donut" role="img" aria-label="ผลการประเมินความเหมาะสมตาม GDMT" style="--hfc-ok:'+ok.toFixed(2)+'%;--hfc-checked:'+checked.toFixed(2)+'%"><div class="hfc-review-donut-inner"><b>'+(share===null?'—':esc(percent(share)))+'</b><small>เหมาะสม / ที่ประเมิน</small></div></div>'
  +'<div class="hfc-review-breakdown"><div class="entry"><span><i class="hfc-dot" style="background:#148d6f"></i> เหมาะสม</span><b>'+fmt(summary.appropriate)+'</b></div><div class="entry"><span><i class="hfc-dot" style="background:#cf9364"></i> ไม่เหมาะสม</span><b>'+fmt(summary.inappropriate)+'</b></div><div class="entry"><span><i class="hfc-dot" style="background:#e9eeeb"></i> ยังไม่ประเมิน</span><b>'+fmt(summary.pending)+'</b></div></div></div>';
  const ph=Object.entries(summary.phenotypes).map(([label,v])=>{const n=v.good+v.bad;return '<div class="ph"><span>'+esc(label)+' · ประเมินแล้ว '+fmt(n)+'</span><b>'+(n?esc(percent(100*v.good/n)):'—')+'</b><span>เหมาะสม '+fmt(v.good)+' / '+fmt(n)+'</span></div>';}).join('');
  return draw+'<div class="hfc-review-subheading">ความเหมาะสมในรายที่ประเมินแล้ว แยกตาม HF phenotype</div><div class="hfc-review-pheno">'+ph+'</div>'
-  +'<div class="hfc-review-footer">ข้อมูลสดจาก HF_Patient_Data!BB (หลังเข้าสู่ระบบ) • นับตามระเบียนที่มี HN ในช่วงวันที่/คลินิกที่เลือก • เหมาะสม ÷ (เหมาะสม + ไม่เหมาะสม) • ไม่รวมที่ยังไม่ประเมินในตัวหาร • แยกจาก GDMT prescribing และ MTD</div>';
+  +'<div class="hfc-review-footer">'+(isBackup?'สำรองจาก HF_Patient_Data!BB ณ 13 ต.ค. 2569 · รวมระเบียนทั้งทะเบียน ไม่ใช่รายงานช่วงวันที่ที่เลือก':'ข้อมูลสดจาก HF_Patient_Data!BB หลังเข้าสู่ระบบ · นับตามช่วงวันที่/คลินิกที่เลือก')+' • เหมาะสม ÷ (เหมาะสม + ไม่เหมาะสม) • ไม่รวมที่ยังไม่ประเมินในตัวหาร • แยกจาก GDMT prescribing และ MTD</div>';
 }
 async function hfcLoadReviewCharts(version,filters){
  const targets=[document.getElementById('hfcContraindications'),document.getElementById('hfcGdmtAppropriateness')];
@@ -1322,12 +1346,14 @@ async function hfcLoadReviewCharts(version,filters){
   const data=await hfcFetchReviewSummary(filters,version);
   if(!data||version!==state.requestVersion||state.view!=='dashboard')return;
   const a=document.getElementById('hfcContraindications'),b=document.getElementById('hfcGdmtAppropriateness');
-  if(a)a.innerHTML=data.constraintsDetected?hfcConstraintReviewChart(data):'<div class="hfc-review-status"><strong>ไม่สามารถอ่านสถานะข้อจำกัดได้</strong> Apps Script ไม่ได้ส่งคอลัมน์ I, L, O, R กรุณาตรวจสอบ Code.gs</div>';
-  if(b)b.innerHTML=data.bbDetected?hfcGdmtAppropriatenessChart(data):'<div class="hfc-review-status"><strong>ไม่สามารถอ่านผลประเมิน GDMT ได้</strong> Apps Script ไม่ได้ส่งคอลัมน์ BB แม้เรียกดูระเบียนเต็มแล้ว ต้องปรับ Code.gs ให้รองรับ HF_Patient_Data!BB</div>';
+  if(a)a.innerHTML=data.constraintsDetected?hfcConstraintReviewChart(data):hfcGdmtBackupNote('สถานะข้อจำกัด I/L/O/R ไม่อยู่ใน API')+hfcConstraintReviewChart(HFC_GDMT_VERIFIED_SNAPSHOT);
+  if(b)b.innerHTML=data.bbDetected?hfcGdmtAppropriatenessChart(data):hfcGdmtBackupNote('ผลประเมิน BB ไม่อยู่ใน API')+hfcGdmtAppropriatenessChart(HFC_GDMT_VERIFIED_SNAPSHOT);
  }catch(e){
   if(version!==state.requestVersion||state.view!=='dashboard')return;
   const message='<div class="hfc-review-status"><strong>ยังไม่สามารถโหลดข้อมูลการประเมินได้</strong>ตรวจสอบสิทธิ์บัญชี/การเชื่อมต่อ Apps Script แล้วกดรีเฟรช Dashboard • '+esc(String(e.message||'เกิดข้อผิดพลาด'))+'</div>';
-  for(const id of ['hfcContraindications','hfcGdmtAppropriateness']){const node=document.getElementById(id);if(node)node.innerHTML=message;}
+  const n1=document.getElementById('hfcContraindications'),n2=document.getElementById('hfcGdmtAppropriateness');
+  if(n1)n1.innerHTML=hfcGdmtBackupNote('ไม่สามารถอ่านข้อมูลสดจาก Apps Script ได้')+hfcConstraintReviewChart(HFC_GDMT_VERIFIED_SNAPSHOT);
+  if(n2)n2.innerHTML=hfcGdmtBackupNote('ไม่สามารถอ่านข้อมูลสดจาก Apps Script ได้')+hfcGdmtAppropriatenessChart(HFC_GDMT_VERIFIED_SNAPSHOT);
  }
 }
 
