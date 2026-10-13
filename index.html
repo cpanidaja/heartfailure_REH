@@ -86,6 +86,44 @@
 .hfc-review-pheno .ph span{font-size:10px;color:var(--muted)}
 @media(max-width:700px){.hfc-review-layout{gap:16px}.hfc-review-donut{width:135px;height:135px}.hfc-review-donut-inner{height:96px;width:96px}.hfc-review-donut-inner b{font-size:19px}.hfc-review-breakdown{min-width:160px}.hfc-review-pheno .ph{min-width:105px}}
 
+
+/* Executive_Dashboard chart replicas | fixed audited sheet snapshot; responsive and aggregate only */
+.hfc-execdash-section{margin:24px 0 12px}
+.hfc-execdash-heading{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}
+.hfc-execdash-heading h2{margin:0;font-size:17px;letter-spacing:-.3px;color:var(--ink)}
+.hfc-execdash-asof{font-size:10px;color:#476f60;background:#ecf7f1;border:1px solid #cee9dc;border-radius:100px;padding:5px 10px}
+.hfc-execdash-alert{font-size:11px;line-height:1.7;color:#86672c;padding:10px 12px;border-radius:10px;background:#fff7e8;border:1px solid #f4e7ca;margin-bottom:16px}
+.hfc-execdash-list{display:grid;gap:12px}
+.hfc-execdash-row{border:1px solid #eef3f0;background:#fbfdfb;border-radius:10px;padding:10px 12px}
+.hfc-execdash-rownames{display:flex;align-items:center;gap:14px;justify-content:space-between;margin-bottom:6px}
+.hfc-execdash-rownames strong{font-size:11px;color:#2c5645}
+.hfc-execdash-rownames span{font-size:11px;color:#557367;white-space:nowrap}
+.hfc-execdash-track{height:13px;position:relative;border-radius:9px;background:#e7f0eb;overflow:visible}
+.hfc-execdash-bar{height:100%;border-radius:9px;background:linear-gradient(90deg,#279f76,#4cc4a0);min-width:0}
+.hfc-execdash-target{position:absolute;top:-3px;bottom:-3px;width:2px;background:#3a5770;border-radius:2px;transform:translateX(-1px)}
+.hfc-execdash-detail{font-size:9px;color:#6e8279;margin-top:7px;line-height:1.5}
+.hfc-execdash-status{margin-left:8px;font-size:9px;border-radius:5px;padding:2px 6px;background:#e4f5ea;color:#227650}
+.hfc-execdash-classes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;min-height:265px;align-items:end}
+.hfc-execdash-class{min-width:0;text-align:center;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:9px;height:100%}
+.hfc-execdash-classcol{height:175px;width:min(58px,65%);background:#edf4f0;border-radius:10px 10px 5px 5px;position:relative;display:flex;align-items:flex-end;overflow:hidden}
+.hfc-execdash-classfill{width:100%;min-height:0;border-radius:10px 10px 5px 5px;background:linear-gradient(0deg,#18886a,#74cbb1)}
+.hfc-execdash-class strong{font-size:15px;color:#1d7558}
+.hfc-execdash-class .hfc-execdash-classname{font-size:10px;font-weight:700;color:#405e50;overflow-wrap:anywhere}
+.hfc-execdash-class small{font-size:10px;color:#7a8a80}
+.hfc-execdash-source{font-size:10px;line-height:1.6;color:var(--muted);margin:14px 0 0}
+@media(max-width:700px){
+.hfc-execdash-heading h2{font-size:15px}
+.hfc-execdash-classes{gap:7px;min-height:240px}
+.hfc-execdash-classcol{height:150px;width:min(46px,72%)}
+.hfc-execdash-class strong{font-size:12px}
+.hfc-execdash-class .hfc-execdash-classname{font-size:9px;line-height:1.5}
+.hfc-execdash-class small{font-size:9px}
+.hfc-execdash-rownames{align-items:flex-start}
+.hfc-execdash-rownames strong{max-width:63%}
+.hfc-execdash-status{display:inline-block;margin-left:0}
+}
+@media print{.hfc-execdash-section{break-inside:avoid}.hfc-execdash-classcol,.hfc-execdash-bar{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+
 </style>
 <style>
 /* Luminous clinical workspace — pearl, emerald and luminous mint. */
@@ -1218,9 +1256,39 @@ async function hfcLoadReviewCharts(version,filters){
  }
 }
 
+
+/* Replicas of the two native charts in the Google Sheets Executive_Dashboard.
+   Audited snapshot: these figures are intentionally NOT tied to Web App period filters.
+   No patient-level values are embedded or requested from the public GitHub Pages host. */
+const HFC_EXECUTIVE_SNAPSHOT={"source":"Executive_Dashboard","asOf":"ตัวชี้วัดหลัก ณ 10 ต.ค. 2569 • DRP ณ 13 ต.ค. 2569","note":"กราฟชุดนี้เป็นข้อมูลสรุปจากชีต ณ วันที่อ้างอิง ไม่เปลี่ยนตามตัวกรองวันที่หรือคลินิกของเว็บ","kpis":[{"label":"ครบ FMT / GDMT","actual":77.35849056603774,"target":60,"lowerIsBetter":false,"description":"41/53 • ครั้งรับบริการ HFrEF ที่เข้าเกณฑ์ประเมิน","status":"ผ่านเกณฑ์"},{"label":"MTD · ผู้ป่วยทั้งทะเบียน","actual":86.97916666666666,"target":60,"lowerIsBetter":false,"description":"ตัวเศษ 167 HN ไม่ซ้ำที่ถึง MTD / ตัวหาร 192 HN ไม่ซ้ำทั้งหมดในทะเบียน","status":"ผ่านเกณฑ์"},{"label":"Medication adherence","actual":96,"target":80,"lowerIsBetter":false,"description":"48/50 • ครั้งที่ได้รับการประเมิน","status":"ผ่านเกณฑ์"},{"label":"DRP resolution","actual":100,"target":80,"lowerIsBetter":false,"description":"แก้ไขสำเร็จ 7 / 7 เหตุการณ์ DRP • 01/10–13/10/2026","status":"ผ่านเกณฑ์"},{"label":"Preventable ADR","actual":0,"target":5,"lowerIsBetter":true,"description":"0/61 • ครั้งรับบริการทั้งหมด; ค่ายิ่งต่ำยิ่งดี","status":"ผ่านเกณฑ์ <5%"}],"gdmt":[{"label":"ACEi / ARB / ARNI","percent":83.33333333333334,"received":30,"assessed":36},{"label":"β-blocker","percent":100,"received":47,"assessed":47},{"label":"MRA","percent":72.72727272727273,"received":16,"assessed":22},{"label":"SGLT2i","percent":75,"received":3,"assessed":4}]};
+function hfcExecutiveKpiChart(){
+ const data=HFC_EXECUTIVE_SNAPSHOT.kpis;
+ return '<div class="hfc-execdash-list" role="img" aria-label="กราฟ KPI Performance vs Target จาก Executive_Dashboard">'+data.map(r=>{
+  const actual=Math.max(0,Math.min(100,Number(r.actual)||0)),target=Math.max(0,Math.min(100,Number(r.target)||0)),good=r.lowerIsBetter?actual<target:actual>=target;
+  return '<div class="hfc-execdash-row"><div class="hfc-execdash-rownames"><strong>'+esc(r.label)+'</strong><span>ผล '+esc(percent(actual))+' / เป้า '+(r.lowerIsBetter?'&lt;':'≥')+esc(percent(target))+'</span></div>'
+    +'<div class="hfc-execdash-track"><div class="hfc-execdash-bar" style="width:'+actual.toFixed(2)+'%;'+(good?'':'background:linear-gradient(90deg,#bd9756,#d6b37b)')+'"></div><i class="hfc-execdash-target" style="left:'+target.toFixed(2)+'%" aria-hidden="true"></i></div>'
+    +'<div class="hfc-execdash-detail">'+esc(r.description)+' <span class="hfc-execdash-status">'+(good?'ผ่านเป้าหมาย':'ยังไม่ผ่านเป้าหมาย')+'</span></div></div>';
+ }).join('')+'</div><p class="hfc-execdash-source">เส้นแนวตั้ง = เป้าหมาย • ตัวชี้วัด ADR ที่ป้องกันได้ยิ่งต่ำยิ่งดี • MTD ใช้ HN ไม่ซ้ำทั้งทะเบียน ไม่ใช่เฉพาะเดือน</p>';
+}
+function hfcExecutiveGdmtChart(){
+ const data=HFC_EXECUTIVE_SNAPSHOT.gdmt;
+ return '<div class="hfc-execdash-classes" role="img" aria-label="กราฟ GDMT Class Coverage จาก Executive_Dashboard">'+data.map(r=>{
+ const p=Math.max(0,Math.min(100,Number(r.percent)||0));
+ return '<div class="hfc-execdash-class"><strong>'+esc(percent(p))+'</strong><div class="hfc-execdash-classcol"><div class="hfc-execdash-classfill" style="height:'+p.toFixed(2)+'%"></div></div><div class="hfc-execdash-classname">'+esc(r.label)+'</div><small>'+esc(fmt(r.received))+' / '+esc(fmt(r.assessed))+' ครั้ง</small></div>';
+ }).join('')+'</div><p class="hfc-execdash-source">การได้รับยา ÷ การประเมินของแต่ละกลุ่มยา (eligible-adjusted) • ตัวหารแตกต่างกัน • ไม่ใช่จำนวนผู้ป่วย HN ไม่ซ้ำ</p>';
+}
+function hfcExecutiveDashboardSnapshot(){
+ const src=HFC_EXECUTIVE_SNAPSHOT;
+ return '<section class="hfc-execdash-section"><div class="hfc-execdash-heading"><h2>Executive Dashboard · กราฟจาก Google Sheets</h2><span class="hfc-execdash-asof">'+esc(src.asOf)+'</span></div>'
+    +'<p class="hfc-execdash-alert">'+esc(src.note)+'</p>'
+    +'<div class="grid">'+panel('ผลการดำเนินงานเทียบเป้าหมาย','KPI Performance vs Target • อ้างอิงค่าจริงและเป้าหมายจากชีต',hfcExecutiveKpiChart(),'EXECUTIVE KPI')
+    +panel('ความครอบคลุม GDMT แยกกลุ่มยา','GDMT Class Coverage • จำนวนได้รับยา/จำนวนที่ประเมิน',hfcExecutiveGdmtChart(),'GDMT COVERAGE')+'</div></section>';
+}
+
 function dashboardHTML(d){const n=d.total;return heading('ภาพรวมคลินิกหัวใจล้มเหลว','ติดตามคุณภาพการใช้ยา ความปลอดภัย และผลลัพธ์ของผู้ป่วย', '<button id="newPatient" class="btn btn-primary">'+icon('plus')+'บันทึกผู้ป่วย</button>')+toolbar()+
  '<section class="hero"><div><div class="eyebrow">CARE THAT MAKES A DIFFERENCE</div><h2>ทุกข้อมูล เชื่อมต่อการดูแลที่ดีขึ้น</h2><p>'+esc(state.boot.organization)+' · '+dateTH(d.filters.start)+' ถึง '+dateTH(d.filters.end)+'</p><div class="hero-badge"><i></i>CONNECTED CARE NETWORK</div></div>'+hologram()+'<div class="hero-right"><div class="hero-stat"><div class="value mono">'+fmt(d.patientCount)+'</div><div class="label">ผู้ป่วย HN ไม่ซ้ำ</div></div><div class="hero-divider"></div><div class="hero-stat"><div class="value mono">'+fmt(d.eligibleComplete)+'<span style="font-size:16px;color:#89a697"> / '+fmt(d.eligibleCount)+'</span></div><div class="label">HFrEF ครบ FMT ตาม eligibility · ครั้งบริการ</div></div></div><svg class="hero-heart" viewBox="0 0 200 100" fill="none" stroke="white" stroke-width="6"><path d="M0 50h35l15-30 25 60 25-55 17 25h83"/></svg></section>'+
  '<div class="stats">'+metric('ครั้งรับบริการทั้งหมด',fmt(n),'ผู้ป่วย '+fmt(d.patientCount)+' ราย','users')+metric('New case',fmt(d.newVisits),'HN ไม่ซ้ำ '+fmt(d.newPatients)+' ราย','plus')+metric('ครั้งบริการที่พบ DRP',fmt(d.drpVisits),'DRP Log '+fmt(d.drpEvents)+' เหตุการณ์','activity')+metric('DRP resolution',percent(d.drpResolution),fmt(d.drpResolvedVisits)+' / '+fmt(d.drpVisits)+' ครั้งที่พบ DRP','check')+metric('Readmission 30 วัน',percent(d.readmission),fmt(d.readmissionCount)+' / '+fmt(n)+' ครั้งบริการ','heart')+metric('KCCQ-12 เฉลี่ย',fmt(d.kccq.value), 'มีผลประเมิน '+fmt(d.kccq.n)+' ครั้ง · 0–100','chart')+'</div>'+
+ hfcExecutiveDashboardSnapshot()+
  '<div class="hfc-new-section"><div class="section-label"><h2>กราฟวิเคราะห์บริการและการใช้ยา</h2><span>ข้อมูลจาก Google Sheets · ปรับตามตัวกรองด้านบน</span></div></div><div class="grid">'+panel('สัดส่วนการรับบริการรายใหม่','New case เทียบกับครั้งรับบริการอื่นในช่วงที่เลือก',hfcVisitMix(d),'VISIT MIX')+panel('เปรียบเทียบการใช้ GDMT แยกกลุ่มยา','ร้อยละได้รับยาในผู้ป่วย HFrEF ที่ eligible',hfcEligibleChart(d.gdmt),'GDMT RATE')+'</div>'+
  '<div class="grid grid-wide">'+panel('การใช้ยาตามมาตรฐาน GDMT · HFrEF','Eligible-adjusted: ใช่ ÷ (ใช่ + ไม่ใช่) · “ข้อจำกัด” ไม่อยู่ในตัวหาร',bars(d.gdmt,{total:true}),'ELIGIBLE-ADJUSTED')+panel('แนวโน้มการเข้ารับบริการ',d.trendMode==='daily'?'จำนวนครั้งรับบริการตามวันในช่วงที่เลือก':'จำนวนครั้งรับบริการตามเดือนในช่วงที่เลือก',trendChart(d.trend),d.trendMode==='daily'?'DAILY TREND':'MONTHLY TREND')+'</div>'+
  '<div class="grid">'+panel('HFrEF · FMT score','จำนวนกลุ่มที่ใช้ยา ÷ จำนวนกลุ่มที่ eligible เช่น 2/2, 3/3, 4/4 · “ข้อจำกัด” ตัดออกจาก denominator',scoreRing(d),'ELIGIBLE-ADJUSTED')+panel('HFrEF · ช่องว่าง FMT','นับเฉพาะสถานะ “ไม่ใช่” เป็น gap · “ข้อจำกัด” ไม่เป็น gap และไม่อยู่ใน denominator',bars(d.gap)+'<div class="panel-foot"><span>HFpEF ครบ MRA + SGLT2i</span><strong>'+fmt(d.hfpComplete)+' / '+fmt(d.hfpCount)+' ครั้ง</strong></div>','FMT GAP')+'</div>'+
@@ -1314,6 +1382,7 @@ function applyAccessUI(){
 function executiveHTML(model){
  return heading('บทสรุปสำหรับผู้บริหาร','รายงานภาพรวมครบทุกประเด็น พร้อมคำอธิบายฐานนับและข้อจำกัดใต้ทุกตาราง','<div class="executive-actions"><button id="exportDocx" class="btn btn-primary">'+icon('download')+'DOCX</button><button id="exportXlsx" class="btn">'+icon('download')+'Excel</button><button id="printExecutive" class="btn">'+icon('print')+'พิมพ์</button></div>','EXECUTIVE INTELLIGENCE')+toolbar()+
  '<div class="detail-kpis">'+metric('ผู้ป่วย HN ไม่ซ้ำ',fmt(model.summary.patients),'ช่วงข้อมูลที่เลือก','users')+metric('ครั้งรับบริการ',fmt(model.summary.visits),'ข้อมูลครบทุกแถวที่เกี่ยวข้อง','activity')+metric('ผ่านเป้าหมาย',fmt(model.summary.passed),'ตามนิยามตัวชี้วัดต้นฉบับ','check')+metric('ต้องติดตาม',fmt(model.summary.notMet),'ไม่มีตัวหาร '+model.summary.notAssessable+' รายการ','alert')+'</div>'+
+ hfcExecutiveDashboardSnapshot()+
  '<article class="executive-document"><header class="report-heading"><div class="eyebrow">ROI ET HOSPITAL · EXECUTIVE BRIEF</div><h2>'+esc(model.title)+'</h2><p>'+esc(model.subtitle)+'</p><p>ช่วง '+dateTH(model.period.start)+' ถึง '+dateTH(model.period.end)+' · '+esc(model.period.clinic)+'</p><p>จัดทำ '+dateTH(model.generatedDate)+' · แหล่งข้อมูล '+esc(model.sourceName)+'</p></header><nav class="executive-index no-print">'+model.sections.map(s=>'<a href="#exec_'+s.id+'">'+esc(s.title)+'</a>').join('')+'</nav>'+model.sections.map(section=>'<section class="executive-section" id="exec_'+section.id+'"><h2>'+esc(section.title)+'</h2>'+section.paragraphs.map(text=>'<p>'+esc(text)+'</p>').join('')+section.tables.map(t=>'<div class="executive-table"><h3>'+esc(t.title)+'</h3><div class="table-wrap"><table><thead><tr>'+t.headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+(t.rows.length?t.rows.map(r=>'<tr>'+r.map(v=>'<td>'+esc(v===null||v===undefined?'ไม่สามารถประเมิน':typeof v==='number'?fmt(v):v)+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+t.headers.length+'">ยังไม่มีข้อมูลในช่วงรายงาน</td></tr>')+'</tbody></table></div><p class="table-explanation"><strong>คำอธิบายใต้ตาราง</strong> '+esc(t.explanation)+'</p></div>').join('')+'</section>').join('')+'</article>';
 }
 async function downloadExecutive(format){const button=$(format==='docx'?'exportDocx':'exportXlsx');button.disabled=true;try{
