@@ -1197,18 +1197,18 @@ function hfcCreateReviewAccumulator(){
  return {source:'HF_Patient_Data',field:'BB',visits:0,rowsReceived:0,bbDetected:false,constraintsDetected:false,limitations:[0,0,0,0],assessed:0,appropriate:0,inappropriate:0,pending:0,unrecognized:0,phenotypes:{HFrEF:{good:0,bad:0},HFpEF:{good:0,bad:0}},readMode:'preview'};
 }
 function hfcApplyReviewRows(out,rows){
- const cols=['I','L','O','R'];
- (Array.isArray(rows)?rows:[]).forEach(row=>{
+ const list=Array.isArray(rows)?rows:[],cols=['I','L','O','R'];
+ const bbAvailable=list.some(r=>Object.prototype.hasOwnProperty.call(r?.values||{},'BB'));
+ const limitationAvailable=cols.every(c=>list.some(r=>Object.prototype.hasOwnProperty.call(r?.values||{},c)));
+ out.bbDetected=out.bbDetected||bbAvailable;
+ out.constraintsDetected=out.constraintsDetected||limitationAvailable;
+ list.forEach(row=>{
   const v=row&&row.values||{},hn=String(v.D??'').trim();
   out.rowsReceived++;
   if(!hn)return;
   out.visits++;
-  if(cols.some(c=>Object.prototype.hasOwnProperty.call(v,c))){
-   out.constraintsDetected=true;
-   cols.forEach((c,i)=>{if(String(v[c]??'').trim()==='ข้อจำกัด')out.limitations[i]++;});
-  }
-  if(Object.prototype.hasOwnProperty.call(v,'BB')){
-   out.bbDetected=true;
+  if(limitationAvailable)cols.forEach((c,i)=>{if(String(v[c]??'').trim()==='ข้อจำกัด')out.limitations[i]++;});
+  if(bbAvailable){
    const assessment=String(v.BB??'').trim(),phen=String(v.AU??'').trim();
    if(assessment==='เหมาะสม'){out.appropriate++;out.assessed++;if(out.phenotypes[phen])out.phenotypes[phen].good++;}
    else if(assessment==='ไม่เหมาะสม'){out.inappropriate++;out.assessed++;if(out.phenotypes[phen])out.phenotypes[phen].bad++;}
@@ -1264,6 +1264,13 @@ async function hfcFetchReviewSummary(filters,version){
  }
  if(!detailBB&&!detailLimits){
   throw new Error('Apps Script ไม่ส่งคอลัมน์ I, L, O, R และ BB ทั้งในรายการย่อและระเบียนเต็ม จำเป็นต้องปรับ Code.gs ฝั่งเซิร์ฟเวอร์');
+ }
+ // If preview already contains all limitation statuses, show its chart immediately.
+ // An older Apps Script deployment may still omit BB from getRecord; don't block the limitation chart.
+ if(!detailBB&&showLimitations){
+  hfcApplyReviewRows(result,previews);
+  result.readMode='limitations-preview-only';
+  return result;
  }
  // Only hydrate detail when essential fields are unavailable in the preview.
  const needDetail=!showBB||!showLimitations;
