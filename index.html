@@ -1099,6 +1099,24 @@ body:is([data-view="dashboard"],[data-view="report"],[data-view="executive"],[da
 
 <style>
 /* HF executive graphite / sea-glass palette; keeps entry forms untouched. */
+
+/* Align legacy SVG, ring and donut visuals with the same chart family. */
+body[data-view="dashboard"] .hfc-donut{background:conic-gradient(#448a91 0 var(--hfc-share),#e5f0ed var(--hfc-share) 100%)!important}
+body[data-view="dashboard"] .hfc-review-donut{background:conic-gradient(#448a91 0 var(--hfc-ok),#cc9685 var(--hfc-ok) var(--hfc-checked),#e5f0ed var(--hfc-checked) 100%)!important}
+body[data-view="dashboard"] .ring svg circle:not(:first-child){stroke:#3f8790!important}
+body[data-view="dashboard"] .ring svg circle:nth-of-type(4n+3){stroke:#75aba3!important}
+body[data-view="dashboard"] .ring svg circle:nth-of-type(4n+4){stroke:#7b9fb4!important}
+body[data-view="dashboard"] .ring svg circle:nth-of-type(4n+5){stroke:#a0c3b2!important}
+body[data-view="dashboard"] .score-line:nth-child(4n+1) i{background:#3f8790!important}
+body[data-view="dashboard"] .score-line:nth-child(4n+2) i{background:#75aba3!important}
+body[data-view="dashboard"] .score-line:nth-child(4n+3) i{background:#7b9fb4!important}
+body[data-view="dashboard"] .score-line:nth-child(4n+4) i{background:#a0c3b2!important}
+body[data-view="dashboard"] svg.chart path[stroke="#33a26b"]{stroke:#3d8590!important}
+body[data-view="dashboard"] svg.chart path[stroke="#be9a5c"]{stroke:#84a9ac!important}
+body[data-view="dashboard"] svg.chart circle[stroke="#33a26b"]{stroke:#3d8590!important}
+body[data-view="dashboard"] .legend i{background:#3d8590!important}
+body[data-view="dashboard"] .legend i[style]{background:#84a9ac!important}
+
 @media screen {
  body[data-view="dashboard"],body[data-view="executive"]{--hfc-graph:#357b86;--hfc-graph-2:#6caca3;--hfc-ink:#294a55;--hfc-track:#eaf1f0;background:#f4f9f8;color:var(--hfc-ink)}
  body[data-view="dashboard"] :is(.panel,.stat,.hfc-execdash-row),body[data-view="executive"] :is(.panel,.stat,.hfc-execdash-row){background:#fff;border:1px solid #e0ebe8;box-shadow:0 7px 22px #30515b0b;border-radius:16px}
