@@ -1096,6 +1096,48 @@ body:is([data-view="dashboard"],[data-view="report"],[data-view="executive"],[da
  }
 }
 </style>
+
+<style>
+/* HF executive graphite / sea-glass palette; keeps entry forms untouched. */
+@media screen {
+ body[data-view="dashboard"],body[data-view="executive"]{--hfc-graph:#357b86;--hfc-graph-2:#6caca3;--hfc-ink:#294a55;--hfc-track:#eaf1f0;background:#f4f9f8;color:var(--hfc-ink)}
+ body[data-view="dashboard"] :is(.panel,.stat,.hfc-execdash-row),body[data-view="executive"] :is(.panel,.stat,.hfc-execdash-row){background:#fff;border:1px solid #e0ebe8;box-shadow:0 7px 22px #30515b0b;border-radius:16px}
+ body[data-view="dashboard"] :is(.panel-header h3,.section-label h2),body[data-view="executive"] :is(.panel-header h3,.section-label h2){color:var(--hfc-ink)}
+ body[data-view="dashboard"] .hfc-execdash-heading h2,body[data-view="executive"] .hfc-execdash-heading h2{font-size:19px;line-height:1.4;color:var(--hfc-ink)}
+ .hfc-execdash-heading-copy{display:grid;gap:6px}
+ .hfc-execdash-controls{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+ body[data-view="dashboard"] .hfc-execdash-asof,body[data-view="executive"] .hfc-execdash-asof{background:#f2f8f6;border-color:#dfeae7;color:#607b7c;border-radius:20px}
+ body[data-view="dashboard"] .hfc-execdash-alert,body[data-view="executive"] .hfc-execdash-alert{background:#f7faf9;border:1px solid #e3edeb;color:#617a7a;border-radius:13px;padding:13px 16px;line-height:1.8}
+ #hfcExecRefresh{background:linear-gradient(110deg,#2f6d7c,#438e90)!important;border:0!important;border-radius:12px;color:white!important;font-weight:700;box-shadow:0 5px 14px #3277822b}
+ #hfcExecRefresh:hover{background:linear-gradient(110deg,#275c6a,#387c7e)!important}
+ #hfcExecRefresh .icon{width:16px;height:16px}
+ #hfcExecRefresh:disabled{cursor:wait}
+ .hfc-exec-refresh-status{font-size:10px;color:#617b7d;line-height:1.6}
+ body[data-view="dashboard"] .hfc-execdash-row,body[data-view="executive"] .hfc-execdash-row{background:#fbfdfc;padding:15px 16px}
+ body[data-view="dashboard"] .hfc-execdash-rownames strong,body[data-view="executive"] .hfc-execdash-rownames strong{color:#2e5961;font-size:12px}
+ body[data-view="dashboard"] .hfc-execdash-rownames span,body[data-view="executive"] .hfc-execdash-rownames span{color:#657e81}
+ body[data-view="dashboard"] :is(.track,.hfc-counttrack,.hfc-review-track,.hfc-kpi-track,.hfc-execdash-track),body[data-view="executive"] :is(.track,.hfc-counttrack,.hfc-review-track,.hfc-kpi-track,.hfc-execdash-track){background:var(--hfc-track)!important;box-shadow:none!important}
+ body[data-view="dashboard"] :is(.fill,.hfc-countfill,.hfc-review-fill,.hfc-kpi-fill,.hfc-execdash-bar),body[data-view="executive"] :is(.fill,.hfc-countfill,.hfc-review-fill,.hfc-kpi-fill,.hfc-execdash-bar){background:linear-gradient(90deg,#317884,#6caca3)!important;box-shadow:none!important}
+ body[data-view="dashboard"] .bar-row:nth-child(3n+2) .fill,body[data-view="dashboard"] .hfc-review-row:nth-child(3n+2) .hfc-review-fill{background:linear-gradient(90deg,#448a87,#9ac4b2)!important}
+ body[data-view="dashboard"] .bar-row:nth-child(3n+3) .fill,body[data-view="dashboard"] .hfc-review-row:nth-child(3n+3) .hfc-review-fill{background:linear-gradient(90deg,#496f88,#89acba)!important}
+ body[data-view="dashboard"] .hfc-execdash-target,body[data-view="executive"] .hfc-execdash-target{width:3px;background:#335c6a;box-shadow:0 0 0 3px #335c6a18}
+ body[data-view="dashboard"] .hfc-execdash-classcol,body[data-view="executive"] .hfc-execdash-classcol{background:#eaf1f0}
+ body[data-view="dashboard"] .hfc-execdash-classfill,body[data-view="executive"] .hfc-execdash-classfill{background:linear-gradient(0deg,#337681,#74ada8)!important}
+ body[data-view="dashboard"] .hfc-execdash-class:nth-child(4n+2) .hfc-execdash-classfill,body[data-view="executive"] .hfc-execdash-class:nth-child(4n+2) .hfc-execdash-classfill{background:linear-gradient(0deg,#44877f,#96c0ad)!important}
+ body[data-view="dashboard"] .hfc-execdash-class:nth-child(4n+3) .hfc-execdash-classfill,body[data-view="executive"] .hfc-execdash-class:nth-child(4n+3) .hfc-execdash-classfill{background:linear-gradient(0deg,#426b87,#88adbe)!important}
+ body[data-view="dashboard"] .hfc-execdash-class:nth-child(4n+4) .hfc-execdash-classfill,body[data-view="executive"] .hfc-execdash-class:nth-child(4n+4) .hfc-execdash-classfill{background:linear-gradient(0deg,#58988e,#abcbbb)!important}
+ body[data-view="dashboard"] .hfc-execdash-class strong,body[data-view="executive"] .hfc-execdash-class strong{color:#376d75}
+ body[data-view="dashboard"] .hfc-chart-viz svg rect[fill]{fill:#42878b!important}
+ body[data-view="dashboard"] .hfc-chart-viz svg rect[fill]:nth-of-type(3n+2){fill:#6a9eac!important}
+ body[data-view="dashboard"] .hfc-chart-viz svg rect[fill]:nth-of-type(3n+3){fill:#83b5a6!important}
+ body[data-view="dashboard"] #hfcReviewRefresh{background:linear-gradient(110deg,#2f6d7c,#438e90)!important;color:white!important;border:0!important}
+ .hfc-execdash-freshness{display:inline-block;margin:5px 0 0 8px;color:#6b8185;font-size:9px}
+ body[data-view="dashboard"] .hfc-execdash-status,body[data-view="executive"] .hfc-execdash-status{background:#e9f3ef;color:#35746b;border-radius:12px}
+ body[data-view="dashboard"] .hfc-execdash-status.is-warning,body[data-view="executive"] .hfc-execdash-status.is-warning{background:#f9f1e2;color:#8b6c41}
+}
+@media(max-width:700px){.hfc-execdash-controls{justify-content:flex-start;width:100%}.hfc-execdash-rownames{flex-wrap:wrap}.hfc-execdash-rownames span{white-space:normal}.hfc-execdash-rownames strong{max-width:100%!important}}
+@media print{.hfc-execdash-controls{display:none!important}}
+</style>
 </head>
 <body>
 <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -1506,29 +1548,77 @@ async function hfcLoadReviewCharts(version,filters){
    Audited snapshot: these figures are intentionally NOT tied to Web App period filters.
    No patient-level values are embedded or requested from the public GitHub Pages host. */
 const HFC_EXECUTIVE_SNAPSHOT={"source":"Executive_Dashboard","asOf":"ตัวชี้วัดหลัก ณ 10 ต.ค. 2569 • DRP ณ 13 ต.ค. 2569","note":"กราฟชุดนี้เป็นข้อมูลสรุปจากชีต ณ วันที่อ้างอิง ไม่เปลี่ยนตามตัวกรองวันที่หรือคลินิกของเว็บ","kpis":[{"label":"ครบ FMT / GDMT","actual":77.35849056603774,"target":60,"lowerIsBetter":false,"description":"41/53 • ครั้งรับบริการ HFrEF ที่เข้าเกณฑ์ประเมิน","status":"ผ่านเกณฑ์"},{"label":"MTD · ผู้ป่วยทั้งทะเบียน","actual":86.97916666666666,"target":60,"lowerIsBetter":false,"description":"ตัวเศษ 167 HN ไม่ซ้ำที่ถึง MTD / ตัวหาร 192 HN ไม่ซ้ำทั้งหมดในทะเบียน","status":"ผ่านเกณฑ์"},{"label":"Medication adherence","actual":96,"target":80,"lowerIsBetter":false,"description":"48/50 • ครั้งที่ได้รับการประเมิน","status":"ผ่านเกณฑ์"},{"label":"DRP resolution","actual":100,"target":80,"lowerIsBetter":false,"description":"แก้ไขสำเร็จ 7 / 7 เหตุการณ์ DRP • 01/10–13/10/2026","status":"ผ่านเกณฑ์"},{"label":"Preventable ADR","actual":0,"target":5,"lowerIsBetter":true,"description":"0/61 • ครั้งรับบริการทั้งหมด; ค่ายิ่งต่ำยิ่งดี","status":"ผ่านเกณฑ์ <5%"}],"gdmt":[{"label":"ACEi / ARB / ARNI","percent":83.33333333333334,"received":30,"assessed":36},{"label":"β-blocker","percent":100,"received":47,"assessed":47},{"label":"MRA","percent":72.72727272727273,"received":16,"assessed":22},{"label":"SGLT2i","percent":75,"received":3,"assessed":4}]};
+
+/* Executive chart audit boundary: no private patient records in the public page.
+   Three numerator/denominator pairs and GDMT coverage come from authenticated
+   getDashboard. MTD and adherence remain visibly date-stamped historical values. */
+let HFC_EXEC_LIVE=null,HFC_EXEC_FILTER='',HFC_EXEC_AT=null;
+function hfcExecKey(){const f=state.filters||{};return JSON.stringify([f.start||'',f.end||'',f.clinic||'ทั้งหมด']);}
+function hfcExecData(){return HFC_EXEC_LIVE&&HFC_EXEC_FILTER===hfcExecKey()?HFC_EXEC_LIVE:null;}
+function hfcExecStamp(){return hfcExecData()&&HFC_EXEC_AT?new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Bangkok'}).format(HFC_EXEC_AT):'';}
+function hfcExecKpis(){
+ const rows=HFC_EXECUTIVE_SNAPSHOT.kpis.map(r=>({...r,live:false})),d=hfcExecData();
+ if(!d)return rows;
+ function set(i,numerator,denominator,description){
+  if(numerator===undefined||numerator===null||denominator===undefined||denominator===null)return;
+  const n=Number(numerator),q=Number(denominator);
+  if(!Number.isFinite(n)||!Number.isFinite(q)||n<0||q<0||n>q)return;
+  rows[i]={...rows[i],actual:q?100*n/q:null,description:q?fmt(n)+'/'+fmt(q)+' • '+description:'ไม่มีตัวหารในช่วงที่เลือก • '+description,live:true};
+ }
+ set(0,d.eligibleComplete,d.eligibleCount,'ครั้งบริการ HFrEF ครบ FMT ตาม eligibility');
+ set(3,d.drpResolvedVisits,d.drpVisits,'ครั้งบริการที่พบ DRP และแก้ไขสำเร็จ');
+ set(4,d.preventableEvents,d.total,'ADR ที่ป้องกันได้ ÷ ครั้งบริการทั้งหมด');
+ return rows;
+}
+function hfcExecGdmt(){
+ const d=hfcExecData(),a=Array.isArray(d?.gdmt)?d.gdmt:[];
+ const valid=a.filter(r=>r&&Number(r.total)>0&&Number(r.count)>=0&&Number(r.count)<=Number(r.total));
+ if(valid.length<4)return HFC_EXECUTIVE_SNAPSHOT.gdmt.map(r=>({...r,live:false}));
+ return valid.slice(0,4).map(r=>({label:r.label,percent:100*Number(r.count)/Number(r.total),received:Number(r.count),assessed:Number(r.total),live:true}));
+}
+
 function hfcExecutiveKpiChart(){
- const data=HFC_EXECUTIVE_SNAPSHOT.kpis;
- return '<div class="hfc-execdash-list" role="img" aria-label="กราฟ KPI Performance vs Target จาก Executive_Dashboard">'+data.map(r=>{
-  const actual=Math.max(0,Math.min(100,Number(r.actual)||0)),target=Math.max(0,Math.min(100,Number(r.target)||0)),good=r.lowerIsBetter?actual<target:actual>=target;
-  return '<div class="hfc-execdash-row"><div class="hfc-execdash-rownames"><strong>'+esc(r.label)+'</strong><span>ผล '+esc(percent(actual))+' / เป้า '+(r.lowerIsBetter?'&lt;':'≥')+esc(percent(target))+'</span></div>'
-    +'<div class="hfc-execdash-track"><div class="hfc-execdash-bar" style="width:'+actual.toFixed(2)+'%;'+(good?'':'background:linear-gradient(90deg,#bd9756,#d6b37b)')+'"></div><i class="hfc-execdash-target" style="left:'+target.toFixed(2)+'%" aria-hidden="true"></i></div>'
-    +'<div class="hfc-execdash-detail">'+esc(r.description)+' <span class="hfc-execdash-status">'+(good?'ผ่านเป้าหมาย':'ยังไม่ผ่านเป้าหมาย')+'</span></div></div>';
- }).join('')+'</div><p class="hfc-execdash-source">เส้นแนวตั้ง = เป้าหมาย • ตัวชี้วัด ADR ที่ป้องกันได้ยิ่งต่ำยิ่งดี • MTD ใช้ HN ไม่ซ้ำทั้งทะเบียน ไม่ใช่เฉพาะเดือน</p>';
+ const data=hfcExecKpis();
+ return '<div class="hfc-execdash-list" role="img" aria-label="เปรียบเทียบ KPI กับเป้าหมาย พร้อมสถานะวันที่ของข้อมูล">'+data.map(r=>{
+  const valid=r.actual!==null&&r.actual!==undefined&&Number.isFinite(Number(r.actual)),actual=valid?Math.max(0,Math.min(100,Number(r.actual))):0,target=Math.max(0,Math.min(100,Number(r.target)||0)),good=valid&&(r.lowerIsBetter?actual<target:actual>=target);
+  return '<div class="hfc-execdash-row"><div class="hfc-execdash-rownames"><strong>'+esc(r.label)+'</strong><span>ผล '+(valid?esc(percent(actual)):'—')+' / เป้า '+(r.lowerIsBetter?'&lt;':'≥')+esc(percent(target))+'</span></div>'
+   +'<div class="hfc-execdash-track"><div class="hfc-execdash-bar" style="width:'+actual.toFixed(2)+'%"></div><i class="hfc-execdash-target" style="left:'+target.toFixed(2)+'%" aria-hidden="true"></i></div>'
+   +'<div class="hfc-execdash-detail">'+esc(r.description)+' <span class="hfc-execdash-status'+(good?'':' is-warning')+'">'+(!valid?'ไม่มีตัวหาร':good?'ผ่านเป้าหมาย':'ยังไม่ผ่านเป้าหมาย')+'</span><span class="hfc-execdash-freshness">'+(r.live?'ข้อมูลสดตามตัวกรอง':'ข้อมูลอ้างอิง · 10–13 ต.ค. 2569')+'</span></div></div>';
+ }).join('')+'</div><p class="hfc-execdash-source">เส้นแนวตั้ง = เป้าหมาย • ADR ที่ป้องกันได้ต้องน้อยกว่า 5% • MTD ใช้ HN ไม่ซ้ำทั้งทะเบียน ไม่ใช่เฉพาะเดือน</p>';
 }
 function hfcExecutiveGdmtChart(){
- const data=HFC_EXECUTIVE_SNAPSHOT.gdmt;
- return '<div class="hfc-execdash-classes" role="img" aria-label="กราฟ GDMT Class Coverage จาก Executive_Dashboard">'+data.map(r=>{
- const p=Math.max(0,Math.min(100,Number(r.percent)||0));
- return '<div class="hfc-execdash-class"><strong>'+esc(percent(p))+'</strong><div class="hfc-execdash-classcol"><div class="hfc-execdash-classfill" style="height:'+p.toFixed(2)+'%"></div></div><div class="hfc-execdash-classname">'+esc(r.label)+'</div><small>'+esc(fmt(r.received))+' / '+esc(fmt(r.assessed))+' ครั้ง</small></div>';
- }).join('')+'</div><p class="hfc-execdash-source">การได้รับยา ÷ การประเมินของแต่ละกลุ่มยา (eligible-adjusted) • ตัวหารแตกต่างกัน • ไม่ใช่จำนวนผู้ป่วย HN ไม่ซ้ำ</p>';
+ const data=hfcExecGdmt(),live=data.every(r=>r.live);
+ return '<div class="hfc-execdash-classes" role="img" aria-label="GDMT Class Coverage">'+data.map(r=>{
+  const p=Math.max(0,Math.min(100,Number(r.percent)||0));
+  return '<div class="hfc-execdash-class"><strong>'+esc(percent(p))+'</strong><div class="hfc-execdash-classcol"><div class="hfc-execdash-classfill" style="height:'+p.toFixed(2)+'%"></div></div><div class="hfc-execdash-classname">'+esc(r.label)+'</div><small>'+esc(fmt(r.received))+' / '+esc(fmt(r.assessed))+' ครั้ง</small></div>';
+ }).join('')+'</div><p class="hfc-execdash-source">จำนวนได้รับยา ÷ eligible แต่ละกลุ่ม (ไม่รวม “ข้อจำกัด” ในตัวหาร) • '+(live?'ข้อมูลสดตามตัวกรอง':'ข้อมูลอ้างอิง 10 ต.ค. 2569; ไม่ใช่ข้อมูลสด')+'</p>';
 }
 function hfcExecutiveDashboardSnapshot(){
- const src=HFC_EXECUTIVE_SNAPSHOT;
- return '<section class="hfc-execdash-section"><div class="hfc-execdash-heading"><h2>Executive Dashboard · กราฟจาก Google Sheets</h2><span class="hfc-execdash-asof">'+esc(src.asOf)+'</span></div>'
-    +'<p class="hfc-execdash-alert">'+esc(src.note)+'</p>'
-    +'<div class="grid">'+panel('ผลการดำเนินงานเทียบเป้าหมาย','KPI Performance vs Target • อ้างอิงค่าจริงและเป้าหมายจากชีต',hfcExecutiveKpiChart(),'EXECUTIVE KPI')
-    +panel('ความครอบคลุม GDMT แยกกลุ่มยา','GDMT Class Coverage • จำนวนได้รับยา/จำนวนที่ประเมิน',hfcExecutiveGdmtChart(),'GDMT COVERAGE')+'</div></section>';
+ const live=Boolean(hfcExecData()),when=hfcExecStamp(),src=HFC_EXECUTIVE_SNAPSHOT;
+ return '<section id="hfcExecutiveSection" class="hfc-execdash-section"><div class="hfc-execdash-heading"><div class="hfc-execdash-heading-copy"><h2>Executive Dashboard · กราฟจาก Google Sheets</h2><span class="hfc-execdash-asof">'+esc(live?'ข้อมูลสดบางตัว • ดึง '+when:'ข้อมูลอ้างอิง • '+src.asOf)+'</span></div>'
+  +'<div class="hfc-execdash-controls"><button type="button" id="hfcExecRefresh" class="btn btn-primary">'+icon('refresh')+'โหลดกราฟล่าสุด</button><span id="hfcExecStatus" class="hfc-exec-refresh-status" role="status">'+esc(live?'ดึงข้อมูลล่าสุดจากระบบเมื่อ '+when:'กดปุ่มเพื่อดึงข้อมูลใหม่')+'</span></div></div>'
+  +'<p class="hfc-execdash-alert">'+(live?'กราฟ FMT, DRP, Preventable ADR และ GDMT ใช้ข้อมูลที่ระบบส่งได้ตามช่วงวันที่/คลินิก • MTD และ Medication adherence ยังเป็นผลอ้างอิงเดิม':'กราฟชุดนี้มีข้อมูลอ้างอิง ณ 10–13 ต.ค. 2569 • กดโหลดกราฟล่าสุดเพื่อรับข้อมูลที่ระบบรองรับ; MTD และ Medication adherence ยังไม่ได้เชื่อมสด')+'</p>'
+  +'<div class="grid">'+panel('ผลการดำเนินงานเทียบเป้าหมาย','KPI Performance vs Target • ระบุข้อมูลสด/อ้างอิงแต่ละตัว',hfcExecutiveKpiChart(),'EXECUTIVE KPI')
+  +panel('ความครอบคลุม GDMT แยกกลุ่มยา','GDMT Coverage • จำนวนได้รับยา/จำนวนที่ประเมิน',hfcExecutiveGdmtChart(),'GDMT COVERAGE')+'</div></section>';
 }
+async function hfcExecRefresh(){
+ const b=document.getElementById('hfcExecRefresh'),s=document.getElementById('hfcExecStatus');
+ if(!b||b.disabled||!sessionToken)return;
+ if(state.dirty||state.summaryDirty||state.reportDirty){toast('โปรดบันทึกข้อมูลที่แก้ไขก่อนโหลดกราฟ',true);return;}
+ const token=sessionToken,version=state.requestVersion,view=state.view,y=window.scrollY;
+ b.disabled=true;if(s)s.textContent='กำลังดึงข้อมูลจาก Google Sheets…';
+ try{
+  clearApiCache();
+  const d=await api('getDashboard',state.filters);
+  if(token!==sessionToken||version!==state.requestVersion||view!==state.view)return;
+  HFC_EXEC_LIVE=d;HFC_EXEC_FILTER=hfcExecKey();HFC_EXEC_AT=new Date();
+  if(view==='dashboard'){await loadView(true);window.scrollTo(0,y);}
+  else{const el=document.getElementById('hfcExecutiveSection');if(el)el.outerHTML=hfcExecutiveDashboardSnapshot();hfcBindExecRefresh();}
+  toast('โหลดกราฟใหม่แล้ว • ตัวชี้วัดอ้างอิงเดิมยังมีวันที่กำกับ');
+ }catch(e){const st=document.getElementById('hfcExecStatus');if(st)st.textContent='โหลดไม่สำเร็จ · ลองอีกครั้ง';toast('โหลดกราฟไม่สำเร็จ: '+(e?.message||'การเชื่อมต่อล้มเหลว'),true);}
+ finally{const b2=document.getElementById('hfcExecRefresh');if(b2)b2.disabled=false;}
+}
+function hfcBindExecRefresh(){const b=document.getElementById('hfcExecRefresh');if(b)b.onclick=hfcExecRefresh;}
 
 function dashboardHTML(d){const n=d.total;return heading('ภาพรวมคลินิกหัวใจล้มเหลว','ติดตามคุณภาพการใช้ยา ความปลอดภัย และผลลัพธ์ของผู้ป่วย', '<button id="newPatient" class="btn btn-primary">'+icon('plus')+'บันทึกผู้ป่วย</button>')+toolbar()+
  '<section class="hero"><div><div class="eyebrow">CARE THAT MAKES A DIFFERENCE</div><h2>ทุกข้อมูล เชื่อมต่อการดูแลที่ดีขึ้น</h2><p>'+esc(state.boot.organization)+' · '+dateTH(d.filters.start)+' ถึง '+dateTH(d.filters.end)+'</p><div class="hero-badge"><i></i>CONNECTED CARE NETWORK</div></div>'+hologram()+'<div class="hero-right"><div class="hero-stat"><div class="value mono">'+fmt(d.patientCount)+'</div><div class="label">ผู้ป่วย HN ไม่ซ้ำ</div></div><div class="hero-divider"></div><div class="hero-stat"><div class="value mono">'+fmt(d.eligibleComplete)+'<span style="font-size:16px;color:#89a697"> / '+fmt(d.eligibleCount)+'</span></div><div class="label">HFrEF ครบ FMT ตาม eligibility · ครั้งบริการ</div></div></div><svg class="hero-heart" viewBox="0 0 200 100" fill="none" stroke="white" stroke-width="6"><path d="M0 50h35l15-30 25 60 25-55 17 25h83"/></svg></section>'+
@@ -1578,7 +1668,7 @@ function reportHTML(d){const r=state.report,fields=r.fields;return heading('ร�
 function printPage(){document.querySelectorAll('input,select,textarea').forEach(el=>{const mirror=el.parentElement.querySelector('.print-mirror');if(mirror)mirror.textContent=el.type==='date'?dateTH(el.value):el.value;});if($('dashboardSummary')){let mirror=$('dashboardSummary').parentElement.querySelector('.print-mirror');if(!mirror){mirror=document.createElement('div');mirror.className='print-mirror';$('dashboardSummary').after(mirror);}mirror.textContent=$('dashboardSummary').value;}window.print();}
 function navRender(){ $('nav').innerHTML=navigation.filter(([key])=>(key!=='users'||currentUser?.role==='admin')).map(([key,label,ico])=>(key==='report'?'<div class="nav-caption" style="margin-top:20px">INSIGHTS & RESOURCES</div>':'')+'<button class="nav-btn '+(state.view===key?'active':'')+'" data-view="'+key+'">'+icon(ico)+esc(label)+'</button>').join('');$('nav').querySelectorAll('.nav-btn[data-view]').forEach(b=>b.onclick=()=>navigate(b.dataset.view)); }
 async function navigate(view){if(state.reportDirty&&!confirm('รายงานมีข้อมูลที่ยังไม่บันทึก ต้องการออกจากหน้านี้หรือไม่?'))return;state.reportDirty=false;state.view=view;state.page=1;setNavigationOpen(false);navRender();$('crumb').textContent=navigation.find(n=>n[0]===view)[1];await loadView();window.scrollTo({top:0,behavior:'smooth'});}
-async function loadView(silent){silent=silent===true;const version=++state.requestVersion,view=state.view;document.body.dataset.view=view;if(!silent)$('page').innerHTML='<div class="loading-text">กำลังโหลดข้อมูลจาก '+BACKEND_NAME+'…</div><div class="loading-grid">'+Array(6).fill('<div class="skeleton"></div>').join('')+'</div>';try{if(view===VISIT_SHEET&&!state.boot.schemas[VISIT_SHEET]){$('page').innerHTML=visitUnavailableHTML();return;}if(view==='executive'||view==='users'){await loadExtendedView(view,version);applyAccessUI();return;}if(view==='dashboard'){const d=await api('getDashboard',state.filters);if(version!==state.requestVersion)return;state.dash=d;$('page').innerHTML=dashboardHTML(d);bindToolbar();hfcBindReviewCharts(version,d.filters||state.filters);$('newPatient').onclick=()=>openNewPatient();document.querySelectorAll('.overdue-open').forEach(b=>b.onclick=()=>openRecord('HF_Patient_Data',+b.dataset.row));$('dashboardSummary').oninput=()=>{state.summaryDirty=true;};$('saveSummary').onclick=async()=>{const btn=$('saveSummary');btn.disabled=true;try{await api('saveDashboardSummary',$('dashboardSummary').value,d.summary);state.summaryDirty=false;toast('บันทึกสรุปผลใน '+BACKEND_NAME+' แล้ว');await loadView();}catch(e){toast(e.message,true);}finally{btn.disabled=false;}};$('footerStatus').textContent='อัปเดต '+d.updatedAt;}
+async function loadView(silent){silent=silent===true;const version=++state.requestVersion,view=state.view;document.body.dataset.view=view;if(!silent)$('page').innerHTML='<div class="loading-text">กำลังโหลดข้อมูลจาก '+BACKEND_NAME+'…</div><div class="loading-grid">'+Array(6).fill('<div class="skeleton"></div>').join('')+'</div>';try{if(view===VISIT_SHEET&&!state.boot.schemas[VISIT_SHEET]){$('page').innerHTML=visitUnavailableHTML();return;}if(view==='executive'||view==='users'){await loadExtendedView(view,version);applyAccessUI();return;}if(view==='dashboard'){const d=await api('getDashboard',state.filters);if(version!==state.requestVersion)return;state.dash=d;HFC_EXEC_LIVE=d;HFC_EXEC_FILTER=hfcExecKey();HFC_EXEC_AT=new Date();$('page').innerHTML=dashboardHTML(d);bindToolbar();hfcBindExecRefresh();hfcBindReviewCharts(version,d.filters||state.filters);$('newPatient').onclick=()=>openNewPatient();document.querySelectorAll('.overdue-open').forEach(b=>b.onclick=()=>openRecord('HF_Patient_Data',+b.dataset.row));$('dashboardSummary').oninput=()=>{state.summaryDirty=true;};$('saveSummary').onclick=async()=>{const btn=$('saveSummary');btn.disabled=true;try{await api('saveDashboardSummary',$('dashboardSummary').value,d.summary);state.summaryDirty=false;toast('บันทึกสรุปผลใน '+BACKEND_NAME+' แล้ว');await loadView();}catch(e){toast(e.message,true);}finally{btn.disabled=false;}};$('footerStatus').textContent='อัปเดต '+d.updatedAt;}
  else if(view==='references'){const fresh=await api('getBootstrap');if(version!==state.requestVersion)return;state.boot=fresh;$('page').innerHTML=referenceHTML();document.querySelectorAll('[data-reference]').forEach(b=>b.onclick=()=>{state.reference=b.dataset.reference;loadView();});$('printReference').onclick=printPage;}
  else if(view==='report'){const [report,d]=await Promise.all([api('getReport'),api('getDashboard',state.filters)]);if(version!==state.requestVersion)return;state.report=report;state.dash=d;report.fields.start=state.filters.start||report.fields.start;report.fields.end=state.filters.end||report.fields.end;report.fields.clinic=state.filters.clinic;$('page').innerHTML=reportHTML(d);bindToolbar();$('printReport').onclick=printPage;document.querySelectorAll('[data-report],.report-note').forEach(el=>el.oninput=()=>{state.reportDirty=true;});bindReportRange();bindReportSave();}
  else {const data=await api('listRecords',view,state.filters,state.page,10);if(version!==state.requestVersion)return;state.table=data;$('page').innerHTML=recordTableHTML(view,data);bindToolbar();$('newRecord').onclick=()=>openRecord(view);if($('syncVisits'))$('syncVisits').onclick=syncVisits;document.querySelectorAll('.edit-record').forEach(b=>b.onclick=()=>openRecord(view,+b.dataset.row));$('prevPage').onclick=()=>{state.page=data.page-1;loadView();};$('nextPage').onclick=()=>{state.page=data.page+1;loadView();};}
@@ -1640,7 +1730,7 @@ function usersHTML(){return heading('บัญชีผู้ใช้งาน'
 }
 function resetAccountForm(){accountEditing=null;$('accountForm').reset();$('accountUsername').readOnly=false;$('accountRole').disabled=false;$('accountActive').disabled=false;$('accountPassword').required=true;$('accountFormTitle').textContent='สร้างบัญชีใหม่';$('passwordHint').textContent='บัญชีใหม่ต้องระบุ';$('accountError').textContent='';}
 function bindAccounts(){resetAccountForm();$('newAccount').onclick=resetAccountForm;document.querySelectorAll('[data-account]').forEach(btn=>btn.onclick=()=>{const user=accountRows[+btn.dataset.account];accountEditing=user;$('accountUsername').value=user.username;$('accountUsername').readOnly=true;$('accountName').value=user.displayName;$('accountPassword').value='';$('accountPassword').required=false;$('accountRole').value=user.role;$('accountActive').checked=user.active;$('accountRole').disabled=user.username==='admin';$('accountActive').disabled=user.username==='admin';$('accountFormTitle').textContent='แก้ไขบัญชี · '+user.username;$('passwordHint').textContent='เว้นว่างเพื่อคงรหัสเดิม';$('accountError').textContent='';$('accountName').focus();});$('accountForm').onsubmit=async event=>{event.preventDefault();const button=$('saveAccount');button.disabled=true;try{const payload={username:$('accountUsername').value,displayName:$('accountName').value,password:$('accountPassword').value,role:$('accountRole').value,active:$('accountActive').checked,revision:accountEditing?.revision};const result=await api('saveUser',payload);$('accountPassword').value='';toast(result.message);if(payload.username===currentUser.username&&payload.password){showLogin();toast('รหัสผ่านเปลี่ยนแล้ว กรุณาเข้าสู่ระบบใหม่');return;}await loadView();}catch(e){if($('accountError'))$('accountError').textContent=e.message;toast(e.message,true);}finally{if($('saveAccount'))$('saveAccount').disabled=false;}};}
-async function loadExtendedView(view,version){if(view==='executive'){const model=await api('getExecutiveReport',state.filters);if(version!==state.requestVersion)return;executiveReport=model;$('page').innerHTML=executiveHTML(model);bindToolbar();$('exportDocx').onclick=()=>downloadExecutive('docx');$('exportXlsx').onclick=()=>downloadExecutive('xlsx');$('printExecutive').onclick=printPage;}
+async function loadExtendedView(view,version){if(view==='executive'){const model=await api('getExecutiveReport',state.filters);if(version!==state.requestVersion)return;executiveReport=model;$('page').innerHTML=executiveHTML(model);bindToolbar();hfcBindExecRefresh();$('exportDocx').onclick=()=>downloadExecutive('docx');$('exportXlsx').onclick=()=>downloadExecutive('xlsx');$('printExecutive').onclick=printPage;}
  else{if(currentUser?.role!=='admin')throw new Error('บัญชีนี้ไม่มีสิทธิ์จัดการผู้ใช้');accountRows=await api('listUsers');if(version!==state.requestVersion)return;$('page').innerHTML=usersHTML();bindAccounts();}}
 
 let refreshRunning=false,lastMetadataRefresh=Date.now(),lastAutoRefresh=Date.now();
