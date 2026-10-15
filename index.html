@@ -1581,11 +1581,11 @@ async function hfcLoadReviewCharts(version,filters){
    IMPORTANT: these are NOT the filtered getDashboard calculations; never
    overwrite this section from getDashboard. No HN, patient names or CID. */
 const HFC_EXECUTIVE_SNAPSHOT={"schemaVersion":1,"source":"Executive_Dashboard","verifiedFrom":"Google Sheets aggregate cells","checkedAt":"2026-10-16","asOf":"KPI ส่วนอื่น 10 ต.ค. 2569 • DRP ณ 16 ต.ค. 2026","note":"ตัวชี้วัด FMT/GDMT และ adherence อ้างอิง 10 ต.ค. 2569; DRP ถึง 16 ต.ค. 2569 • ปุ่มตรวจสอบไฟล์สรุปข้อมูล ไม่ใช่การเชื่อมสดโดยตรงจาก Google Sheets","registry":{"registeredShown":192,"octoberVisits":61,"octoberUnique":47,"mtdNumerator":164,"mtdDenominator":195,"mtdPct":84.1025641025641,"mtdCountDifference":3},"kpis":[{"label":"ความครบถ้วนของ FMT / GDMT","actual":77.35849056603774,"target":60,"description":"41/53 • ครั้งรับบริการ HFrEF ที่เข้าเกณฑ์ประเมิน","status":"ผ่านเกณฑ์","sourceRow":14,"unit":"percent","lowerIsBetter":false},{"label":"ร้อยละผู้ป่วยที่ได้รับยาในขนาดสูงสุดที่ทนได้ (MTD)","actual":84.1025641025641,"target":60,"description":"ตัวเศษ 164 HN ไม่ซ้ำที่ถึง MTD / ตัวหาร 195 HN ไม่ซ้ำทั้งหมดในทะเบียน","status":"ผ่านเกณฑ์","sourceRow":15,"unit":"percent","lowerIsBetter":false},{"label":"ความร่วมมือในการใช้ยา","actual":96,"target":80,"description":"48/50 • ครั้งที่ได้รับการประเมิน","status":"ผ่านเกณฑ์","sourceRow":16,"unit":"percent","lowerIsBetter":false},{"label":"การแก้ไข DRP สำเร็จ • คิดต่อเหตุการณ์จาก DRP_Log","actual":100,"target":80,"description":"แก้ไขสำเร็จ 7 / 7 เหตุการณ์ DRP • 01/10–16/10/2026","status":"ผ่านเกณฑ์","sourceRow":17,"unit":"percent","lowerIsBetter":false},{"label":"อัตรา ADR ที่สามารถป้องกันได้","actual":0,"target":5,"description":"0/61 • ครั้งรับบริการทั้งหมด; ค่ายิ่งต่ำยิ่งดี","status":"ผ่านเกณฑ์ <5%","sourceRow":18,"unit":"percent","lowerIsBetter":true},{"label":"จำนวน DRP ที่พบ • นับเหตุการณ์ใน DRP_Log","actual":7,"target":null,"description":"บันทึก 7 เหตุการณ์ • ผู้ป่วย HN ไม่ซ้ำ 7 ราย • แก้ไขสำเร็จ 7 เหตุการณ์","status":"ข้อมูลจาก DRP_Log","sourceRow":19,"unit":"count","lowerIsBetter":false},{"label":"ความเหมาะสมตาม GDMT • เฉพาะครั้งที่ประเมิน","actual":100,"target":null,"description":"เหมาะสม 60 / ไม่เหมาะสม 0 • ประเมินแล้ว 60 ครั้ง • ยังไม่กำหนดเกณฑ์เป้าหมาย","status":"สรุปผล","sourceRow":20,"unit":"percent","lowerIsBetter":false}],"gdmt":[{"label":"ACEi / ARB / ARNI","percent":83.33333333333333,"received":30,"assessed":36,"sourceRow":34},{"label":"β-blocker","percent":100,"received":47,"assessed":47,"sourceRow":35},{"label":"MRA","percent":72.72727272727273,"received":16,"assessed":22,"sourceRow":36},{"label":"SGLT2i","percent":75,"received":3,"assessed":4,"sourceRow":37}],"highlights":["ผลเด่น 1  •  MTD เท่ากับ 84.1% สูงกว่าเป้าหมาย 60% อยู่ 24.1 จุดร้อยละ ควรรักษาระดับผลลัพธ์และติดตามผู้ป่วยที่ยังไม่ถึงขนาดสูงสุดที่ทนได้","DRP • แก้ไขสำเร็จ 7/7 เหตุการณ์ (100.0%) ผ่านเป้าหมาย 80% • ให้ตรวจสอบความครบถ้วนของการติดตามผลต่อเนื่อง","จุดแข็ง  •  ความครบถ้วนของ GDMT แบบปรับตามเกณฑ์ความเหมาะสม = 77.4% และความร่วมมือในการใช้ยา = 96.0% สูงกว่าเป้าหมายที่กำหนด","คุณภาพข้อมูล  •  ชีต Dashboard หลักมี 61 ครั้งรับบริการ ขณะที่ชีต HF_Patient_Dashboard มี 50 ครั้ง เนื่องจากนิยาม/ช่วงข้อมูลต่างกัน ควรตรวจสอบและทำให้นิยามแหล่งข้อมูลสอดคล้องกัน"],"sourceCoordinates":{"registry":"Executive_Dashboard!A6:M6","kpis":"Executive_Dashboard!A14:E20","gdmt":"Executive_Dashboard!A34:D37","mtd":"_Executive_Metrics!B2:B4"}};
-let HFC_EXECUTIVE_FEED=HFC_EXECUTIVE_SNAPSHOT,HFC_EXEC_FEED_LOADED=false,HFC_EXEC_FEED_LOADING=false,HFC_EXEC_FEED_CHECKED=null;
+let HFC_EXECUTIVE_FEED=HFC_EXECUTIVE_SNAPSHOT,HFC_EXEC_FEED_LOADED=false,HFC_EXEC_FEED_LOADING=false,HFC_EXEC_FEED_CHECKED=null,HFC_EXEC_FEED_SOURCE='snapshot',HFC_EXEC_FEED_ERROR='';
 function hfcExecKpis(){return (HFC_EXECUTIVE_FEED.kpis||[]).map(r=>({...r}));}
 function hfcExecGdmt(){return (HFC_EXECUTIVE_FEED.gdmt||[]).map(r=>({...r}));}
 function hfcExecVerifiedLabel(row){
- return row.sourceRow===17||row.sourceRow===19?'อ้างอิงถึง 16 ต.ค. 2569':'อ้างอิง ณ 10 ต.ค. 2569';
+ return HFC_EXEC_FEED_SOURCE==='live'?'ค่าจากเซลล์ชีตโดยตรง • อ้างอิงวันที่ตามรายงาน':(row.sourceRow===17||row.sourceRow===19?'อ้างอิงถึง 16 ต.ค. 2569':'อ้างอิง ณ 10 ต.ค. 2569');
 }
 function hfcExecStats(){
  const r=HFC_EXECUTIVE_FEED.registry||{},mtd=Number(r.mtdNumerator||0),base=Number(r.mtdDenominator||0);
@@ -1619,11 +1619,17 @@ function hfcExecutiveGdmtChart(){
 
 function hfcExecutiveDashboardSnapshot(){
  const src=HFC_EXECUTIVE_FEED,r=src.registry||{},checked=src.checkedAt||'';
+ const isLive=HFC_EXEC_FEED_SOURCE==='live';
+ const status=isLive?'เชื่อม Google Sheets ผ่าน Apps Script สำเร็จ · อ่านข้อมูล '+esc(checked):
+   (HFC_EXEC_FEED_SOURCE==='published'?'ข้อมูลไฟล์สรุป ณ '+esc(checked)+' · ไม่ใช่ข้อมูลสด':'กำลังตรวจสอบข้อมูลผ่าน Apps Script…');
+ const banner=isLive
+  ?'ข้อมูลจากเซลล์ Executive_Dashboard โดยตรง ผ่าน Apps Script ที่ตรวจสอบสิทธิ์ · อัปเดตเมื่อกดปุ่ม และไม่เปลี่ยนตามตัวกรองวัน/คลินิกของเว็บ · วันที่ของแต่ละ KPI ยึดตามรายงานในชีต'
+  :'แสดงข้อมูลสรุปสำรอง ไม่ใช่ข้อมูลสดจาก Google Sheets · ต้องติดตั้ง AppsScript_ExecutiveDashboard.gs และเพิ่มคำสั่งใน dispatch() ของ Apps Script เดิม จากนั้น Deploy เวอร์ชันใหม่';
  return '<section id="hfcExecutiveSection" class="hfc-execdash-section"><div class="hfc-execdash-heading"><div class="hfc-execdash-heading-copy"><h2>Executive Dashboard · ข้อมูลตามชีตต้นฉบับ</h2><span class="hfc-execdash-asof">'+esc(src.asOf||'ตัวชี้วัดอ้างอิงจากชีต')+'</span></div>'
-  +'<div class="hfc-execdash-controls"><button type="button" id="hfcExecRefresh" class="btn btn-primary">'+icon('refresh')+'โหลดกราฟล่าสุด</button><span id="hfcExecStatus" class="hfc-exec-refresh-status" role="status">'+esc(HFC_EXEC_FEED_LOADED?'ไฟล์สรุปเผยแพร่ตรวจสอบ ณ '+checked:'กำลังตรวจสอบไฟล์สรุปที่เผยแพร่ · ไม่ใช่ข้อมูลสดจากชีต')+'</span></div></div>'
-  +'<p class="hfc-execdash-alert">กราฟชุดนี้อ้างอิงเซลล์ Executive_Dashboard โดยตรง ไม่เปลี่ยนตามตัวกรองวัน/คลินิก • วันที่ข้อมูลแตกต่างกันตามตัวชี้วัด • ปุ่มโหลดกราฟดึงไฟล์สรุปที่เผยแพร่ ไม่ได้อ่าน Google Sheets แบบ real-time</p>'
+  +'<div class="hfc-execdash-controls"><button type="button" id="hfcExecRefresh" class="btn btn-primary">'+icon('refresh')+'โหลดกราฟล่าสุด</button><span id="hfcExecStatus" class="hfc-exec-refresh-status" role="status">'+status+'</span></div></div>'
+  +'<p class="hfc-execdash-alert">'+banner+'</p>'
   +hfcExecStats()
-  +(Number(r.mtdCountDifference)>0?'<p class="hfc-exec-discrepancy">ตรวจสอบฐานนับ: ช่องผู้ป่วยสะสม A6 แสดง '+esc(fmt(r.registeredShown))+' HN แต่ MTD จาก _Executive_Metrics ใช้ '+esc(fmt(r.mtdDenominator))+' HN (ต่างกัน '+esc(fmt(r.mtdCountDifference))+') — แสดงตามต้นฉบับโดยยังไม่แก้ตัวเลขใน Google Sheets</p>':'')
+  +(Number(r.mtdCountDifference)!==0?'<p class="hfc-exec-discrepancy">ตรวจสอบฐานนับ: ช่องผู้ป่วยสะสม A6 แสดง '+esc(fmt(r.registeredShown))+' HN แต่ MTD จาก _Executive_Metrics ใช้ '+esc(fmt(r.mtdDenominator))+' HN (ต่างกัน '+esc(fmt(Math.abs(r.mtdCountDifference)))+') — แสดงตามต้นฉบับโดยยังไม่แก้ตัวเลขใน Google Sheets</p>':'')
   +'<div class="grid">'+panel('ผลการดำเนินงานเทียบเป้าหมาย','KPI Performance vs Target • ใช้ค่า/ตัวหารจาก Executive_Dashboard!A14:E20',hfcExecutiveKpiChart(),'EXECUTIVE KPI')
   +panel('ความครอบคลุม GDMT แยกกลุ่มยา','GDMT Coverage • ตาม Executive_Dashboard!A34:D37',hfcExecutiveGdmtChart(),'GDMT COVERAGE')+'</div></section>';
 }
@@ -1639,23 +1645,44 @@ async function hfcExecRefresh(silent=false){
  if(HFC_EXEC_FEED_LOADING||(!silent&&btn?.disabled))return;
  const version=state.requestVersion,view=state.view;
  HFC_EXEC_FEED_LOADING=true;if(btn)btn.disabled=true;
- if(status)status.textContent='กำลังตรวจสอบข้อมูลสรุปที่เผยแพร่…';
+ if(status)status.textContent='กำลังอ่านข้อมูลสรุปจาก Google Sheets…';
  try{
-  const address=(NATIVE?'https://cpanidaja.github.io/heartfailure_REH/':'./')+'executive-dashboard-summary.json?revision='+Date.now();
-  const response=await fetch(address,{cache:'no-store'});
-  if(!response.ok)throw new Error('ไม่สามารถอ่านไฟล์ข้อมูลสรุป (HTTP '+response.status+')');
-  const json=await response.json();
-  if(!hfcExecutiveFeedValid(json))throw new Error('รูปแบบข้อมูลสรุปไม่ตรงกับ Executive_Dashboard');
-  HFC_EXECUTIVE_FEED=json;HFC_EXEC_FEED_LOADED=true;HFC_EXEC_FEED_CHECKED=new Date();
+  if(!sessionToken)throw new Error('กรุณาเข้าสู่ระบบก่อนโหลดกราฟล่าสุด');
+  // Preferred path: authenticated Apps Script dispatch reads the exact
+  // aggregated cells each request (no local API cache for this action).
+  let json=null,source='live',rpcError=null;
+  try{
+   json=await api('getExecutiveDashboardSummary');
+   if(!hfcExecutiveFeedValid(json)||json.mode!=='live')throw new Error('Apps Script ส่งข้อมูล Executive_Dashboard ไม่ครบตามรูปแบบ');
+  }catch(e){
+   rpcError=e;
+   // Compatibility fallback while the existing script is awaiting redeploy.
+   // Never mark the public JSON export as a current Google Sheets read.
+   const address=(NATIVE?'https://cpanidaja.github.io/heartfailure_REH/':'./')+'executive-dashboard-summary.json?revision='+Date.now();
+   const response=await fetch(address,{cache:'no-store'});
+   if(!response.ok)throw new Error('Apps Script ยังไม่พร้อม และไฟล์สำรองโหลดไม่สำเร็จ (HTTP '+response.status+')');
+   json=await response.json();source='published';
+   if(!hfcExecutiveFeedValid(json))throw new Error('ไฟล์สรุปที่เผยแพร่มีข้อมูลไม่ครบหรือไม่สอดคล้อง');
+  }
+  HFC_EXECUTIVE_FEED=json;HFC_EXEC_FEED_SOURCE=source;
+  HFC_EXEC_FEED_LOADED=true;HFC_EXEC_FEED_CHECKED=new Date();
+  HFC_EXEC_FEED_ERROR=rpcError?String(rpcError.message||rpcError):'';
   if(view===state.view&&version===state.requestVersion){
    const section=document.getElementById('hfcExecutiveSection');
    if(section)section.outerHTML=hfcExecutiveDashboardSnapshot();
    hfcBindExecRefresh(false);
   }
-  if(!silent)toast('โหลดไฟล์สรุป Executive_Dashboard เวอร์ชันที่เผยแพร่แล้ว • ตรวจสอบวันที่ข้อมูลเหนือกราฟ');
+  if(!silent){
+    if(source==='live')toast('โหลดข้อมูล Executive_Dashboard ล่าสุดจาก Google Sheets ผ่าน Apps Script สำเร็จ');
+    else toast('ยังไม่ได้เชื่อม Apps Script สำหรับ Executive_Dashboard • ขณะนี้ใช้ไฟล์สรุปเก่า กรุณาติดตั้งโค้ดฝั่ง Apps Script',true);
+  }
  }catch(error){
-  if(view===state.view&&version===state.requestVersion){const s=document.getElementById('hfcExecStatus');if(s)s.textContent='ใช้ข้อมูลสรุปสำรองที่ตรวจสอบไว้ (16 ต.ค. 2569)';}
-  if(!silent)toast('โหลดไฟล์สรุปไม่สำเร็จ: '+(error?.message||'ไม่ทราบสาเหตุ'),true);
+  HFC_EXEC_FEED_ERROR=String(error?.message||error);
+  if(view===state.view&&version===state.requestVersion){
+   const s=document.getElementById('hfcExecStatus');
+   if(s)s.textContent='โหลดไม่สำเร็จ · ข้อมูลเดิมยังแสดงอยู่';
+  }
+  if(!silent)toast('โหลดกราฟล่าสุดไม่สำเร็จ: '+HFC_EXEC_FEED_ERROR,true);
  }finally{
   HFC_EXEC_FEED_LOADING=false;
   const b2=document.getElementById('hfcExecRefresh');if(b2)b2.disabled=false;
