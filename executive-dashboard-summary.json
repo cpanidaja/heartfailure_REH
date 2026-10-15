@@ -88,6 +88,13 @@
   ],
   "gdmt": [
     {
+      "label": "ACEi / ARB / ARNI",
+      "percent": 83.33333333333333,
+      "received": 30,
+      "assessed": 36,
+      "sourceRow": 34
+    },
+    {
       "label": "β-blocker",
       "percent": 100,
       "received": 47,
@@ -118,7 +125,7 @@
   "sourceCoordinates": {
     "registry": "Executive_Dashboard!A6:M6",
     "kpis": "Executive_Dashboard!A14:E20",
-    "gdmt": "Executive_Dashboard!A35:D38",
+    "gdmt": "Executive_Dashboard!A34:D37",
     "mtd": "_Executive_Metrics!B2:B4"
   }
 }
