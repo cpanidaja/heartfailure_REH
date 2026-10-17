@@ -143,5 +143,6 @@
     "gdmt": "Executive_Dashboard!A34:D37",
     "mtd": "_Executive_Metrics!B2:B4",
     "eligibility": "Dashboard!B31:D31"
-  }
+  },
+  "definitionVersion": "HF-ALL-ROWS-20261017"
 }
