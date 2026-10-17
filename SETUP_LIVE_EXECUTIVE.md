@@ -1,82 +1,44 @@
-# ทำให้ Executive Dashboard ใน HF Clinic Web App อ่าน Google Sheets สด
+# HF Clinic Web — เชื่อม Executive Dashboard กับ Google Sheets
 
-อัปเดต: 16 ต.ค. 2569
+อัปเดต: 17 ตุลาคม 2569 | กลุ่มงานเภสัชกรรม โรงพยาบาลร้อยเอ็ด
 
-## เป้าหมาย
-เมื่อเปิดหน้า Dashboard หรือกด "โหลดกราฟล่าสุด" ฝั่งเว็บจะเรียกคำสั่ง
-\`api('getExecutiveDashboardSummary')\` ผ่าน **ระบบล็อกอินเดิม** ของ HF Clinic Web App
-ไปยัง Apps Script โครงการเดิม ระบบจะอ่านเฉพาะเซลล์สรุปในชีต
-\`Executive_Dashboard\` และ \`_Executive_Metrics\` จากไฟล์ Google Sheets ของโรงพยาบาล
-โดยไม่มีชื่อผู้ป่วย HN หรือเลขบัตรประชาชนในคำตอบ
+## สิ่งที่แก้แล้วใน GitHub
 
-**ห้าม** เปลี่ยนการแชร์ Google Sheets ให้เป็น "ทุกคนที่มีลิงก์" เพียงเพื่อให้กราฟทำงาน
-และ **ห้าม** เปิดปลายทาง doGet() ที่ส่งข้อมูลโดยไม่มีการตรวจสอบสิทธิ์
+- หน้าเว็บไซต์ `index.html`: แสดง FMT eligibility รายครั้งและปรับ MTD/GDMT Executive Dashboard ให้ใช้ค่าตามชีตล่าสุดที่ตรวจ พร้อมแยกข้อมูลสดกับข้อมูลสรุปสำรอง
+- `executive-dashboard-summary.json`: สรุปผลรวม ณ 17/10/2026 เท่านั้น (ไม่ใช่ข้อมูลสด)
+- `AppsScript_ExecutiveDashboard.gs`: ตัวอ่านข้อมูลสรุปแบบ aggregate-only สำหรับติดตั้งใน Apps Script **โครงการเดิม** หลังระบบตรวจสอบสิทธิ์
 
-## ขั้นตอนที่ต้องทำใน Apps Script (ทำครั้งเดียว)
+## ค่าที่ตรวจจาก Google Sheets เมื่อ 17/10/2026
 
-1. เปิด Apps Script **โครงการเดิมที่เว็บใช้จริง** (ซึ่งให้บริการ \`dispatch\` และ \`login\`)
-   อย่าสร้าง Apps Script แยกโครงการใหม่ อย่าคัดลอกทับ Code.gs เดิม
-2. ในแถบ Files ด้านซ้าย กด + แล้วเลือก **Script** ตั้งชื่อ
-   \`AppsScript_ExecutiveDashboard\`
-3. เปิดไฟล์นี้ใน GitHub:
-   https://github.com/cpanidaja/heartfailure_REH/blob/main/AppsScript_ExecutiveDashboard.gs
-   คัดลอกเนื้อหาทั้งไฟล์ไปใส่ใน Script ที่เพิ่งสร้าง แล้ว Save
-4. เปิด Code.gs (หรือไฟล์เดิม) ค้นหา \`function dispatch\` และตำแหน่งที่แยกคำสั่ง
-   ตาม \`payload.method\` หรือ \`request.method\`.
-   **สำคัญ: เพิ่มคำสั่งใหม่หลังการตรวจสอบ session/token และสิทธิ์ผู้ใช้แล้วเท่านั้น**
+| ตัวชี้วัด | ตัวเศษ / ตัวส่วน | ผล |
+|---|---|---|
+| FMT eligibility รายครั้ง | Eligible 258 / มีค่า AV 272 ครั้ง | 94.9% |
+| MTD รายครั้งทั้งทะเบียน | 268 / 273 ครั้ง | 98.2% |
+| ความครบถ้วน FMT/GDMT (คนละตัวชี้วัดกับ FMT eligibility) | 46 / 58 ครั้ง HFrEF eligible-adjusted | 79.3% |
 
-   ถ้าระบบใช้ switch(method):
-   
-   \`\`\`javascript
+FMT eligibility นับจาก `HF_Patient_Data!D6:D1098` (HN) และ `AV6:AV1098` (FMT eligibility) **นับ HN ซ้ำทั้งเศษและส่วน**:
+```gs
+=COUNTIFS(HF_Patient_Data!D6:D1098,"<>",HF_Patient_Data!AV6:AV1098,"Eligible")
+=COUNTIFS(HF_Patient_Data!D6:D1098,"<>",HF_Patient_Data!AV6:AV1098,"<>")
+```
+สถานะ “ต้องประเมินเพิ่ม” 14 ครั้งอยู่ในตัวหาร และ 1 ครั้งที่ยังไม่มีค่า AV ไม่เข้าตัวหาร ไม่คัด HN ซ้ำ ไม่ใช้สถานะล่าสุดของแต่ละ HN และไม่กรองตามเดือนสำหรับตัวชี้วัดนี้
+
+## วิธีเปิดใช้งานข้อมูลสดผ่าน Apps Script
+
+1. ไปยัง **Apps Script โครงการเดิม** ที่ให้บริการ login/dispatch ของเว็บ `https://cpanidaja.github.io/heartfailure_REH/` ห้ามสร้างโปรเจ็กต์ใหม่หรือแทนที่ Code.gs ทั้งไฟล์
+2. สำรองไฟล์ Script เดิม เพิ่มหรืออัปเดต Script ชื่อ `AppsScript_ExecutiveDashboard` ด้วยเนื้อหาที่ตรวจสอบแล้วใน [GitHub](https://github.com/cpanidaja/heartfailure_REH/blob/main/AppsScript_ExecutiveDashboard.gs)
+3. ใน dispatch เดิม เพิ่มกรณี `getExecutiveDashboardSummary` **หลังตรวจ session/token และสิทธิ์ผู้ใช้เสร็จแล้วเท่านั้น**:
+   ```js
    case 'getExecutiveDashboardSummary':
      return hfReadExecutiveDashboardSummary_();
-   \`\`\`
+   ```
+   ห้ามสร้าง dispatch ซ้ำ หรือเปิด doGet/doPost ใหม่ที่ไม่ตรวจสิทธิ์
+4. บันทึก แล้วเลือก **Deploy → Manage deployments → Edit → New version → Deploy** ใน deployment เดิมของเว็บไซต์
+5. เข้าสู่ระบบในเว็บ กด “โหลดกราฟล่าสุด” และตรวจว่ามีข้อความ **เชื่อม Google Sheets ผ่าน Apps Script สำเร็จ** หากยังขึ้น “ข้อมูลสำรอง” แสดงว่ายังไม่ยืนยันการทำงานของ endpoint ใหม่
+6. ตรวจที่ `Executive_Dashboard!A14:E21`, `_Executive_Metrics!B2:B4` และ `Dashboard!B31:D31` เพื่อยืนยันว่าตัวเลขเท่ากับเว็บหลังโหลดจริง
 
-   ถ้าระบบใช้ if/else:
-   
-   \`\`\`javascript
-   if (method === 'getExecutiveDashboardSummary') {
-     return hfReadExecutiveDashboardSummary_();
-   }
-   \`\`\`
+### ขอบเขตความเป็นส่วนตัว
 
-   ชื่อ \`method\` อาจเป็น \`payload.method\` หรือ \`request.method\`
-   ตามโค้ดจริง **อย่าสร้าง dispatch() ซ้ำ** เพราะอาจทำให้ระบบล็อกอินและบันทึกข้อมูลเสีย
-5. กด **Save** จากนั้นเลือก **Deploy → Manage deployments →
-   Edit (รูปดินสอ) → Version: New version → Deploy**
-   ใช้ Deployment ที่เว็บเดิมเชื่อมอยู่ (อย่าเลือก New deployment ถ้าไม่จำเป็น)
-   หาก Apps Script ขอสิทธิ์เพิ่มเติม ให้ตรวจสอบว่าโครงการเป็นของโรงพยาบาล
-   และอนุญาตเฉพาะสิทธิ์อ่านชีตที่จำเป็น
-6. กลับมาเปิด https://cpanidaja.github.io/heartfailure_REH/ 
-   ล็อกอิน แล้วเปิดหน้า "ภาพรวม" หรือ "บทสรุปสำหรับผู้บริหาร"
-   กด "โหลดกราฟล่าสุด"
-7. ตรวจสถานะ:
-   - **เชื่อม Google Sheets ผ่าน Apps Script สำเร็จ** =
-     ข้อมูลอ่านมาจากเซลล์ชีตต้นฉบับ ณ เวลากดจริง
-   - **แสดงข้อมูลสรุปสำรอง** = backend ยังไม่รองรับคำสั่ง/ยังไม่ได้ Deploy;
-     ตัวเลขที่แสดงเป็นข้อมูลอ้างอิง ไม่ใช่ค่าปัจจุบัน
-   - **โหลดไม่สำเร็จ** = ตรวจ token / สิทธิ์อ่าน Spreadsheet /
-     ชื่อแท็บ หรือ Deployment
+API ตัวนี้อ่านเฉพาะเซลล์สรุปของ Google Sheets และส่งกลับผลรวมตัวชี้วัดเท่านั้น ไม่มี HN ชื่อผู้ป่วยหรือข้อมูลรายบุคคลใน GitHub Pages หรือ JSON สาธารณะ ห้ามเผยแพร่ Google Sheets เป็นสาธารณะเพื่อให้ API ทำงาน
 
-## เซลล์ที่อ่าน
-- \`Executive_Dashboard!A6:M6\` — ผู้ป่วยสะสม 192,
-  visits ต.ค. 61, unique ต.ค. 47 (เป็นค่าที่ชีตแสดง ไม่ใช่คำรับรองว่าอัปเดต)
-- \`Executive_Dashboard!A14:E20\` — KPI 7 รายการ
-- \`Executive_Dashboard!A34:D37\` — GDMT 4 กลุ่มยา
-- \`_Executive_Metrics!B2:B4\` — MTD 164/195 = 84.1%
-- \`Executive_Dashboard!A3\` — วันที่อ้างอิงของรายงาน
-
-**ข้อควรระวัง:** ตัวเลขที่ชีตคำนวณด้วยสูตรจะเปลี่ยนตามสูตรจริง
-แต่ตัวเลขที่พิมพ์คงที่ในชีตจะยังคงเดิมแม้เว็บจะดึงข้อมูลสด
-ดังนั้นการทำให้ "ล่าสุด" ต้องตรวจข้อมูลในต้นฉบับด้วย
-และเลขสะสม A6 (192) ไม่ตรงฐานนับ MTD B2 (195) — ยังไม่ควรแก้โดยไม่มีการตรวจสอบข้อมูล
-
-## ความเป็นส่วนตัว
-- จำกัดการแชร์ไฟล์ Google Sheets ตามนโยบายโรงพยาบาล; ปัจจุบัน
-  เมทาดาทาระบุว่ามีสิทธิ์ "anyone" สำหรับ Commenter ควรทบทวน
-- ตรวจสอบว่า dispatch บังคับ session/token ก่อนเรียกตัวอ่านชีต
-- ไม่มีการส่ง patient-level data ไป GitHub และไม่มี API key ใน GitHub
-
-## ยังไม่ได้ทำอะไร
-ตัวช่วยมีสิทธิ์แก้โค้ด GitHub แต่ยัง **ไม่มีสิทธิ์แก้หรือ Deploy โปรเจ็กต์ Apps Script ที่ใช้งานอยู่**
-ดังนั้นต้องทำขั้นตอนที่ 1–5 โดยผู้ดูแลโปรเจ็กต์ก่อนจะเรียกว่าเชื่อมข้อมูลสดสำเร็จ
+**สถานะ:** การแก้ GitHub สำเร็จ แต่ยังไม่ได้ยืนยันว่าผู้ดูแลได้ปรับ/Deploy โครงการ Apps Script ที่ใช้งานจริง ดังนั้นระบบจะต้องแสดงข้อมูลสำรองพร้อมวันที่จนกว่า backend ใหม่จะใช้งานได้
