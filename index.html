@@ -1840,7 +1840,29 @@ function applyAccessUI(){
  const editable=canEdit();['newPatient','newRecord','syncVisits','saveSummary','saveReport','saveRecordButton'].forEach(id=>{if($(id))$(id).disabled=!editable;});
  if(currentUser){$('avatar').textContent=currentUser.username.slice(0,2).toUpperCase();$('avatar').title=currentUser.displayName+' · '+roleName(currentUser.role);$('userLabel').textContent=currentUser.displayName;$('roleLabel').textContent=roleName(currentUser.role);}
 }
+function executiveReportWithSheetKpis(model){
+ const kpis=HFC_EXECUTIVE_FEED.kpis||[];
+ const sections=(model.sections||[]).map(section=>({...section,tables:(section.tables||[]).map(table=>{
+  const headers=(table.headers||[]).map(v=>String(v||''));
+  const isPerformance=/ตัวชี้วัดผลการดำเนินงาน/.test(String(table.title||''))&&headers.some(v=>v.includes('ตัวชี้วัด'))&&headers.some(v=>v.includes('ผล'));
+  if(!isPerformance||!Array.isArray(table.rows))return table;
+  const resultCol=headers.findIndex(v=>v==='ผล'||v.includes('ผลดำเนินงาน')||v.includes('ผลการดำเนินงาน'));
+  const statusCol=headers.findIndex(v=>v.includes('สถานะ'));
+  if(resultCol<0)return table;
+  return {...table,rows:table.rows.map((row,index)=>{
+   if(index>2)return row;
+   const kpi=kpis.find(item=>item.sourceRow===14+index);
+   if(!kpi||!Number.isFinite(Number(kpi.actual)))return row;
+   const cells=[...row];
+   cells[resultCol]=fmt(Number(kpi.actual));
+   if(statusCol>=0)cells[statusCol]=kpi.status||'คำนวณจาก Executive_Dashboard';
+   return cells;
+  })};
+ })}));
+ return {...model,sections};
+}
 function executiveHTML(model){
+ model=executiveReportWithSheetKpis(model);
  return heading('บทสรุปสำหรับผู้บริหาร','รายงานภาพรวมครบทุกประเด็น พร้อมคำอธิบายฐานนับและข้อจำกัดใต้ทุกตาราง','<div class="executive-actions"><button id="exportDocx" class="btn btn-primary">'+icon('download')+'DOCX</button><button id="exportXlsx" class="btn">'+icon('download')+'Excel</button><button id="printExecutive" class="btn">'+icon('print')+'พิมพ์</button></div>','EXECUTIVE INTELLIGENCE')+toolbar()+
  '<div class="detail-kpis">'+metric('ผู้ป่วย HN ไม่ซ้ำ',fmt(model.summary.patients),'ช่วงข้อมูลที่เลือก','users')+metric('ครั้งรับบริการ',fmt(model.summary.visits),'ข้อมูลครบทุกแถวที่เกี่ยวข้อง','activity')+metric('ผ่านเป้าหมาย',fmt(model.summary.passed),'ตามนิยามตัวชี้วัดต้นฉบับ','check')+metric('ต้องติดตาม',fmt(model.summary.notMet),'ไม่มีตัวหาร '+model.summary.notAssessable+' รายการ','alert')+'</div>'+
  hfcExecutiveDashboardSnapshot()+
@@ -1856,7 +1878,7 @@ function usersHTML(){return heading('บัญชีผู้ใช้งาน'
 }
 function resetAccountForm(){accountEditing=null;$('accountForm').reset();$('accountUsername').readOnly=false;$('accountRole').disabled=false;$('accountActive').disabled=false;$('accountPassword').required=true;$('accountFormTitle').textContent='สร้างบัญชีใหม่';$('passwordHint').textContent='บัญชีใหม่ต้องระบุ';$('accountError').textContent='';}
 function bindAccounts(){resetAccountForm();$('newAccount').onclick=resetAccountForm;document.querySelectorAll('[data-account]').forEach(btn=>btn.onclick=()=>{const user=accountRows[+btn.dataset.account];accountEditing=user;$('accountUsername').value=user.username;$('accountUsername').readOnly=true;$('accountName').value=user.displayName;$('accountPassword').value='';$('accountPassword').required=false;$('accountRole').value=user.role;$('accountActive').checked=user.active;$('accountRole').disabled=user.username==='admin';$('accountActive').disabled=user.username==='admin';$('accountFormTitle').textContent='แก้ไขบัญชี · '+user.username;$('passwordHint').textContent='เว้นว่างเพื่อคงรหัสเดิม';$('accountError').textContent='';$('accountName').focus();});$('accountForm').onsubmit=async event=>{event.preventDefault();const button=$('saveAccount');button.disabled=true;try{const payload={username:$('accountUsername').value,displayName:$('accountName').value,password:$('accountPassword').value,role:$('accountRole').value,active:$('accountActive').checked,revision:accountEditing?.revision};const result=await api('saveUser',payload);$('accountPassword').value='';toast(result.message);if(payload.username===currentUser.username&&payload.password){showLogin();toast('รหัสผ่านเปลี่ยนแล้ว กรุณาเข้าสู่ระบบใหม่');return;}await loadView();}catch(e){if($('accountError'))$('accountError').textContent=e.message;toast(e.message,true);}finally{if($('saveAccount'))$('saveAccount').disabled=false;}};}
-async function loadExtendedView(view,version){if(view==='executive'){const model=await api('getExecutiveReport',state.filters);if(version!==state.requestVersion)return;executiveReport=model;$('page').innerHTML=executiveHTML(model);bindToolbar();hfcBindExecRefresh();$('exportDocx').onclick=()=>downloadExecutive('docx');$('exportXlsx').onclick=()=>downloadExecutive('xlsx');$('printExecutive').onclick=printPage;}
+async function loadExtendedView(view,version){if(view==='executive'){const model=await api('getExecutiveReport',state.filters);if(version!==state.requestVersion)return;await hfcExecRefresh(true);if(HFC_EXEC_FEED_LOADING)await new Promise(resolve=>{const wait=()=>HFC_EXEC_FEED_LOADING?setTimeout(wait,25):resolve();wait();});if(version!==state.requestVersion)return;executiveReport=model;$('page').innerHTML=executiveHTML(model);bindToolbar();hfcBindExecRefresh(false);$('exportDocx').onclick=()=>downloadExecutive('docx');$('exportXlsx').onclick=()=>downloadExecutive('xlsx');$('printExecutive').onclick=printPage;}
  else{if(currentUser?.role!=='admin')throw new Error('บัญชีนี้ไม่มีสิทธิ์จัดการผู้ใช้');accountRows=await api('listUsers');if(version!==state.requestVersion)return;$('page').innerHTML=usersHTML();bindAccounts();}}
 
 let refreshRunning=false,lastMetadataRefresh=Date.now(),lastAutoRefresh=Date.now();
