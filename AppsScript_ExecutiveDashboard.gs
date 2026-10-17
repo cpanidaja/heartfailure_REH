@@ -16,16 +16,18 @@ function hfReadExecutiveDashboardSummary_() {
   const book = SpreadsheetApp.openById(SPREADSHEET_ID);
   const sheet = book.getSheetByName('Executive_Dashboard');
   const metrics = book.getSheetByName('_Executive_Metrics');
-  if (!sheet || !metrics) {
-    throw new Error('EXEC_DASHBOARD_MISSING: ไม่พบแท็บ Executive_Dashboard หรือ _Executive_Metrics');
+  const dashboard = book.getSheetByName('Dashboard');
+  if (!sheet || !metrics || !dashboard) {
+    throw new Error('EXEC_DASHBOARD_MISSING: ไม่พบแท็บ Executive_Dashboard, _Executive_Metrics หรือ Dashboard');
   }
 
   // Bounded aggregate ranges only. getValues() returns percentage fractions
   // (e.g. 0.841) for numeric percentage cells; do not parse rounded display strings.
   const reg = sheet.getRange('A6:M6').getValues()[0];
-  const kpiRows = sheet.getRange('A14:E20').getValues();
+  const kpiRows = sheet.getRange('A14:E21').getValues();
   const gdmtRows = sheet.getRange('A34:D37').getValues();
   const mtdRows = metrics.getRange('B2:B4').getValues();
+  const eligibilityRow = dashboard.getRange('B31:D31').getValues()[0];
   const stamp = sheet.getRange('A3').getDisplayValue();
   const timeZone = book.getSpreadsheetTimeZone() || 'Asia/Bangkok';
 
@@ -49,6 +51,16 @@ function hfReadExecutiveDashboardSummary_() {
       throw new Error('EXEC_DASHBOARD_INVALID: '+description+' อยู่นอกช่วง 0–100%');
     }
     return 100*n;
+  }
+
+  // FMT eligibility counts EVERY assessed visit, including repeated HN.
+  // Only source rows with nonblank HN and AV are included in Dashboard!B31:D31.
+  const eligibilityNumerator = count(eligibilityRow[0], 'Dashboard!B31');
+  const eligibilityDenominator = count(eligibilityRow[1], 'Dashboard!C31');
+  const eligibilityPct = percentFraction(eligibilityRow[2], 'Dashboard!D31');
+  if (!eligibilityDenominator || eligibilityNumerator > eligibilityDenominator ||
+      Math.abs(eligibilityPct - 100*eligibilityNumerator/eligibilityDenominator) > 0.011) {
+    throw new Error('EXEC_DASHBOARD_ELIGIBILITY_MISMATCH: ตรวจสอบ Dashboard!B31:D31');
   }
 
   const denominator = count(mtdRows[0][0], '_Executive_Metrics!B2');
@@ -85,12 +97,15 @@ function hfReadExecutiveDashboardSummary_() {
       sourceRow:row,unit:isCount?'count':'percent',
       lowerIsBetter:row===18};
   });
+  if (Math.abs(kpis[7].actual - eligibilityPct)>0.011) {
+    throw new Error('EXEC_DASHBOARD_ELIGIBILITY_MISMATCH: Executive_Dashboard!B21 ไม่ตรง Dashboard!D31');
+  }
   if (Math.abs(kpis[1].actual - mtdRate)>0.011) {
     throw new Error('EXEC_DASHBOARD_MTD_MISMATCH: Executive_Dashboard!B15 ไม่ตรง _Executive_Metrics');
   }
 
   return {
-    schemaVersion:1,
+    schemaVersion:2,
     source:'Executive_Dashboard',
     mode:'live',
     checkedAt:Utilities.formatDate(new Date(),timeZone,"yyyy-MM-dd'T'HH:mm:ss"),
@@ -104,13 +119,22 @@ function hfReadExecutiveDashboardSummary_() {
       mtdPct:mtdRate,
       mtdCountDifference:denominator-count(reg[0],'A6')
     },
+    eligibility:{
+      numerator:eligibilityNumerator,
+      denominator:eligibilityDenominator,
+      pct:eligibilityPct,
+      pending:eligibilityDenominator-eligibilityNumerator,
+      missing:Math.max(0,count(reg[0],'A6')-eligibilityDenominator),
+      unit:'visits'
+    },
     kpis:kpis,
     gdmt:gdmt,
     sourceCoordinates:{
       registry:'Executive_Dashboard!A6:M6',
-      kpis:'Executive_Dashboard!A14:E20',
+      kpis:'Executive_Dashboard!A14:E21',
       gdmt:'Executive_Dashboard!A34:D37',
-      mtd:'_Executive_Metrics!B2:B4'
+      mtd:'_Executive_Metrics!B2:B4',
+      eligibility:'Dashboard!B31:D31'
     }
   };
 }
