@@ -167,7 +167,8 @@ function hfReadGdmtReviewSummary_() {
   }
 
   const startRow = 6;
-  const endRow = Math.min(sheet.getMaxRows(), Math.max(5, sheet.getLastRow()));
+  // Match the exact source bounds used by Dashboard and Executive formulas.
+  const endRow = Math.min(1098, sheet.getMaxRows(), Math.max(5, sheet.getLastRow()));
   const length = Math.max(0, endRow - startRow + 1);
   const rows = length
     ? sheet.getRange(startRow, 2, length, 53).getDisplayValues() // B:BB
