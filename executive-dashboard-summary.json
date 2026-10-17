@@ -1,45 +1,56 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "source": "Executive_Dashboard",
+  "mode": "published",
   "verifiedFrom": "Google Sheets aggregate cells",
-  "checkedAt": "2026-10-16",
-  "asOf": "KPI ส่วนอื่น 10 ต.ค. 2569 • DRP ณ 16 ต.ค. 2026",
-  "note": "ตัวชี้วัด FMT/GDMT และ adherence อ้างอิง 10 ต.ค. 2569; DRP ถึง 16 ต.ค. 2569 • ปุ่มตรวจสอบไฟล์สรุปข้อมูล ไม่ใช่การเชื่อมสดโดยตรงจาก Google Sheets",
+  "checkedAt": "2026-10-17",
+  "asOf": "ข้อมูลสรุปจาก Google Sheets ณ 17/10/2026 • ช่วงวันที่ของ KPI อื่นอ้างอิงตามชีตต้นฉบับ",
+  "note": "ไฟล์ JSON นี้เป็นข้อมูลสำรอง ณ วันที่ตรวจ ไม่ใช่การเชื่อมต่อสด; อัตรา FMT eligibility คิดจากทุกแถวมี HN และมีค่า AV โดยนับ HN ซ้ำทั้งเศษและส่วน",
   "registry": {
-    "registeredShown": 192,
-    "octoberVisits": 61,
-    "octoberUnique": 47,
-    "mtdNumerator": 164,
-    "mtdDenominator": 195,
-    "mtdPct": 84.1025641025641,
-    "mtdCountDifference": 3
+    "registeredShown": 273,
+    "octoberVisits": 75,
+    "octoberUnique": 70,
+    "mtdNumerator": 268,
+    "mtdDenominator": 273,
+    "mtdPct": 98.16849816849816,
+    "mtdCountDifference": 0
+  },
+  "eligibility": {
+    "numerator": 258,
+    "denominator": 272,
+    "pct": 94.85294117647058,
+    "pending": 14,
+    "missing": 1,
+    "unit": "visits",
+    "sourceColumn": "HF_Patient_Data!AV6:AV1098",
+    "basis": "All rows with nonblank HN and FMT eligibility value; duplicate HN counted"
   },
   "kpis": [
     {
       "label": "ความครบถ้วนของ FMT / GDMT",
-      "actual": 77.35849056603774,
+      "actual": 79.3103448275862,
       "target": 60,
-      "description": "41/53 • ครั้งรับบริการ HFrEF ที่เข้าเกณฑ์ประเมิน",
+      "description": "46/58 • ครั้งบริการ HFrEF ที่เข้าเกณฑ์ประเมิน (eligible-adjusted)",
       "status": "ผ่านเกณฑ์",
       "sourceRow": 14,
       "unit": "percent",
       "lowerIsBetter": false
     },
     {
-      "label": "ร้อยละผู้ป่วยที่ได้รับยาในขนาดสูงสุดที่ทนได้ (MTD)",
-      "actual": 84.1025641025641,
+      "label": "ร้อยละรายการรับบริการที่บันทึกถึง MTD (นับ HN ซ้ำ)",
+      "actual": 98.16849816849816,
       "target": 60,
-      "description": "ตัวเศษ 164 HN ไม่ซ้ำที่ถึง MTD / ตัวหาร 195 HN ไม่ซ้ำทั้งหมดในทะเบียน",
-      "status": "ผ่านเกณฑ์",
+      "description": "ตัวเศษ 268 ครั้งที่ตอบ MTD=ใช่ / ตัวหาร 273 ครั้งที่มี HN • รวม HN ซ้ำทั้งคู่ (*ต้องยืนยันเกณฑ์เป้าหมายรายครั้ง)",
+      "status": "ถึงเกณฑ์เชิงตัวเลข*",
       "sourceRow": 15,
       "unit": "percent",
       "lowerIsBetter": false
     },
     {
       "label": "ความร่วมมือในการใช้ยา",
-      "actual": 96,
+      "actual": 96.96969696969697,
       "target": 80,
-      "description": "48/50 • ครั้งที่ได้รับการประเมิน",
+      "description": "64/66 • ครั้งบริการที่มีผลการประเมิน adherence",
       "status": "ผ่านเกณฑ์",
       "sourceRow": 16,
       "unit": "percent",
@@ -49,7 +60,7 @@
       "label": "การแก้ไข DRP สำเร็จ • คิดต่อเหตุการณ์จาก DRP_Log",
       "actual": 100,
       "target": 80,
-      "description": "แก้ไขสำเร็จ 7 / 7 เหตุการณ์ DRP • 01/10–16/10/2026",
+      "description": "แก้ไขสำเร็จ 7 / 7 เหตุการณ์ DRP • 01/10–17/10/2026",
       "status": "ผ่านเกณฑ์",
       "sourceRow": 17,
       "unit": "percent",
@@ -59,7 +70,7 @@
       "label": "อัตรา ADR ที่สามารถป้องกันได้",
       "actual": 0,
       "target": 5,
-      "description": "0/61 • ครั้งรับบริการทั้งหมด; ค่ายิ่งต่ำยิ่งดี",
+      "description": "0/75 • เหตุการณ์ preventable ADR ÷ ครั้งรับบริการ; ค่ายิ่งต่ำยิ่งดี",
       "status": "ผ่านเกณฑ์ <5%",
       "sourceRow": 18,
       "unit": "percent",
@@ -79,9 +90,19 @@
       "label": "ความเหมาะสมตาม GDMT • เฉพาะครั้งที่ประเมิน",
       "actual": 100,
       "target": null,
-      "description": "เหมาะสม 60 / ไม่เหมาะสม 0 • ประเมินแล้ว 60 ครั้ง • ยังไม่กำหนดเกณฑ์เป้าหมาย",
+      "description": "เหมาะสม 75 / ไม่เหมาะสม 0 • ประเมินแล้ว 75 ครั้ง • ยังไม่กำหนดเกณฑ์เป้าหมาย",
       "status": "สรุปผล",
       "sourceRow": 20,
+      "unit": "percent",
+      "lowerIsBetter": false
+    },
+    {
+      "label": "FMT eligibility • เฉพาะครั้งที่มีผล (นับ HN ซ้ำ)",
+      "actual": 94.85294117647058,
+      "target": null,
+      "description": "Eligible 258 / มีผลประเมิน 272 ครั้ง • ทุก HN รวม HN ซ้ำทั้งตัวเศษและตัวหาร • สถานะต้องประเมินเพิ่มรวมในตัวหาร",
+      "status": "สรุป eligibility",
+      "sourceRow": 21,
       "unit": "percent",
       "lowerIsBetter": false
     }
@@ -89,23 +110,23 @@
   "gdmt": [
     {
       "label": "ACEi / ARB / ARNI",
-      "percent": 83.33333333333333,
-      "received": 30,
-      "assessed": 36,
+      "percent": 85,
+      "received": 34,
+      "assessed": 40,
       "sourceRow": 34
     },
     {
       "label": "β-blocker",
       "percent": 100,
-      "received": 47,
-      "assessed": 47,
+      "received": 52,
+      "assessed": 52,
       "sourceRow": 35
     },
     {
       "label": "MRA",
-      "percent": 72.72727272727273,
-      "received": 16,
-      "assessed": 22,
+      "percent": 76,
+      "received": 19,
+      "assessed": 25,
       "sourceRow": 36
     },
     {
@@ -116,16 +137,11 @@
       "sourceRow": 37
     }
   ],
-  "highlights": [
-    "ผลเด่น 1  •  MTD เท่ากับ 84.1% สูงกว่าเป้าหมาย 60% อยู่ 24.1 จุดร้อยละ ควรรักษาระดับผลลัพธ์และติดตามผู้ป่วยที่ยังไม่ถึงขนาดสูงสุดที่ทนได้",
-    "DRP • แก้ไขสำเร็จ 7/7 เหตุการณ์ (100.0%) ผ่านเป้าหมาย 80% • ให้ตรวจสอบความครบถ้วนของการติดตามผลต่อเนื่อง",
-    "จุดแข็ง  •  ความครบถ้วนของ GDMT แบบปรับตามเกณฑ์ความเหมาะสม = 77.4% และความร่วมมือในการใช้ยา = 96.0% สูงกว่าเป้าหมายที่กำหนด",
-    "คุณภาพข้อมูล  •  ชีต Dashboard หลักมี 61 ครั้งรับบริการ ขณะที่ชีต HF_Patient_Dashboard มี 50 ครั้ง เนื่องจากนิยาม/ช่วงข้อมูลต่างกัน ควรตรวจสอบและทำให้นิยามแหล่งข้อมูลสอดคล้องกัน"
-  ],
   "sourceCoordinates": {
     "registry": "Executive_Dashboard!A6:M6",
-    "kpis": "Executive_Dashboard!A14:E20",
+    "kpis": "Executive_Dashboard!A14:E21",
     "gdmt": "Executive_Dashboard!A34:D37",
-    "mtd": "_Executive_Metrics!B2:B4"
+    "mtd": "_Executive_Metrics!B2:B4",
+    "eligibility": "Dashboard!B31:D31"
   }
 }
