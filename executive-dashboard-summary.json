@@ -48,9 +48,9 @@
     },
     {
       "label": "ความร่วมมือในการใช้ยา",
-      "actual": 96.96969696969697,
+      "actual": 97.33333333333333,
       "target": 80,
-      "description": "64/66 • ครั้งบริการที่มีผลการประเมิน adherence",
+      "description": "73/75 • ครั้งบริการที่มีผลการประเมิน adherence",
       "status": "ผ่านเกณฑ์",
       "sourceRow": 16,
       "unit": "percent",
