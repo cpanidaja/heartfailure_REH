@@ -2,11 +2,11 @@
 """Measure sequential HTTP latency; never prints auth tokens or response bodies."""
 import argparse
 import math
-import os
 import statistics
 import subprocess
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 
@@ -18,16 +18,19 @@ def percentile(values, p):
     return ordered[rank]
 
 
-def identity_token():
+def identity_token(url):
+    parsed = urllib.parse.urlsplit(url)
+    audience = f"{parsed.scheme}://{parsed.netloc}"
     return subprocess.check_output(
-        ["gcloud", "auth", "print-identity-token"], text=True
+        ["gcloud", "auth", "print-identity-token", f"--audiences={audience}"],
+        text=True,
     ).strip()
 
 
 def measure(url, samples, warmup, auth):
     headers = {"Accept": "application/json"}
     if auth:
-        headers["Authorization"] = "Bearer " + identity_token()
+        headers["Authorization"] = "Bearer " + identity_token(url)
     timings, failures = [], 0
     for index in range(warmup + samples):
         request = urllib.request.Request(url, headers=headers)
