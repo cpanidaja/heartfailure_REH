@@ -1168,6 +1168,105 @@ body[data-view="dashboard"] .legend i[style]{background:#84a9ac!important}
 @media(max-width:700px){.hfc-execdash-controls{justify-content:flex-start;width:100%}.hfc-execdash-rownames{flex-wrap:wrap}.hfc-execdash-rownames span{white-space:normal}.hfc-execdash-rownames strong{max-width:100%!important}}
 @media print{.hfc-execdash-controls{display:none!important}}
 </style>
+<style id="hfGlobalChartSystem2026">
+/* Refined clinical chart system: consistent scales, restrained color, strong legibility. */
+@media screen {
+ body[data-view="dashboard"],body[data-view="executive"] {
+  --chart-ink:#294650;--chart-muted:#60777d;--chart-line:#dce8e9;--chart-track:#edf3f3;
+  --chart-primary:#347f87;--chart-primary-light:#7fb7b1;--chart-positive:#377d6d;
+  --chart-warning:#956b2f;--chart-alert:#9b554f;
+ }
+ body[data-view="dashboard"] .hfc-execdash-section,
+ body[data-view="executive"] .hfc-execdash-section {margin:26px 0 18px}
+ body[data-view="dashboard"] .hfc-execdash-heading,
+ body[data-view="executive"] .hfc-execdash-heading {gap:14px;margin-bottom:16px}
+ body[data-view="dashboard"] .hfc-execdash-heading h2,
+ body[data-view="executive"] .hfc-execdash-heading h2 {font-size:clamp(18px,2vw,22px);font-weight:760;letter-spacing:-.025em;color:var(--chart-ink)}
+ body[data-view="dashboard"] .hfc-execdash-asof,
+ body[data-view="executive"] .hfc-execdash-asof {font-size:11px;font-weight:650;color:#516e74;background:#f2f7f7;border-color:#dce8e9;padding:6px 12px}
+ body[data-view="dashboard"] .hfc-execdash-alert,
+ body[data-view="executive"] .hfc-execdash-alert {font-size:12px;color:#566f74;background:#f7fafa;border-color:#dfe9e9;border-radius:14px}
+ body[data-view="dashboard"] .hfc-exec-summary-tile,
+ body[data-view="executive"] .hfc-exec-summary-tile {border-color:#dce7e8;border-radius:16px;box-shadow:0 5px 18px rgba(36,75,83,.055);gap:6px}
+ body[data-view="dashboard"] .hfc-exec-summary-tile>div,
+ body[data-view="executive"] .hfc-exec-summary-tile>div {font-size:12px;font-weight:600;color:#5a7278;line-height:1.5}
+ body[data-view="dashboard"] .hfc-exec-summary-tile strong,
+ body[data-view="executive"] .hfc-exec-summary-tile strong {font-size:clamp(22px,2.5vw,29px);font-variant-numeric:tabular-nums;color:#2d6871}
+ body[data-view="dashboard"] .hfc-exec-summary-tile small,
+ body[data-view="executive"] .hfc-exec-summary-tile small {font-size:11px;line-height:1.55;color:#71858a}
+ body[data-view="dashboard"] .hfc-execdash-list,
+ body[data-view="executive"] .hfc-execdash-list {gap:11px}
+ body[data-view="dashboard"] .hfc-execdash-row,
+ body[data-view="executive"] .hfc-execdash-row {padding:15px 17px;border-color:#e0e9ea;border-radius:14px;background:#fff;box-shadow:0 3px 12px rgba(36,75,83,.035)}
+ body[data-view="dashboard"] .hfc-execdash-rownames,
+ body[data-view="executive"] .hfc-execdash-rownames {gap:10px;margin-bottom:10px}
+ body[data-view="dashboard"] .hfc-execdash-rownames strong,
+ body[data-view="executive"] .hfc-execdash-rownames strong {font-size:13px;color:#304f58;line-height:1.5}
+ body[data-view="dashboard"] .hfc-execdash-rownames span,
+ body[data-view="executive"] .hfc-execdash-rownames span {font-size:12px;color:#536e74;font-weight:650;font-variant-numeric:tabular-nums}
+ body[data-view="dashboard"] .hfc-execdash-track,
+ body[data-view="executive"] .hfc-execdash-track {height:15px;border-radius:999px;overflow:visible;position:relative;background-color:#edf3f3!important;background-image:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),rgba(70,104,110,.14) calc(25% - 1px),rgba(70,104,110,.14) 25%);box-shadow:inset 0 1px 2px rgba(33,68,75,.08)!important}
+ body[data-view="dashboard"] .hfc-execdash-bar,
+ body[data-view="executive"] .hfc-execdash-bar {height:100%;border-radius:999px;background:linear-gradient(90deg,#347b84,#67a69e)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.24)!important}
+ body[data-view="dashboard"] .hfc-execdash-target,
+ body[data-view="executive"] .hfc-execdash-target {z-index:2;top:-4px;bottom:-4px;width:2px;background:#263f50;border:0;box-shadow:0 0 0 3px rgba(38,63,80,.12);border-radius:2px}
+ body[data-view="dashboard"] .hfc-execdash-detail,
+ body[data-view="executive"] .hfc-execdash-detail {font-size:11px;line-height:1.65;color:#62787d;margin-top:9px}
+ body[data-view="dashboard"] .hfc-execdash-status,
+ body[data-view="executive"] .hfc-execdash-status {font-size:10px;font-weight:700;padding:3px 8px;background:#eaf4f0;color:#346f62}
+ body[data-view="dashboard"] .hfc-execdash-status.is-warning,
+ body[data-view="executive"] .hfc-execdash-status.is-warning {background:#f8f1e5;color:#86622f}
+ body[data-view="dashboard"] .hfc-execdash-freshness,
+ body[data-view="executive"] .hfc-execdash-freshness {font-size:10px;color:#6c8185}
+ body[data-view="dashboard"] .hfc-exec-count-divider,
+ body[data-view="executive"] .hfc-exec-count-divider {height:4px;margin:13px 0 2px;background:linear-gradient(90deg,#43818a,#b4d0c8);border-radius:999px}
+ body[data-view="dashboard"] .hfc-execdash-classes,
+ body[data-view="executive"] .hfc-execdash-classes {min-height:260px;gap:14px;padding:18px 10px 12px;border:1px solid #e0e9ea;border-radius:15px;background:linear-gradient(180deg,#fbfdfd,#fff)}
+ body[data-view="dashboard"] .hfc-execdash-class,
+ body[data-view="executive"] .hfc-execdash-class {gap:9px}
+ body[data-view="dashboard"] .hfc-execdash-class strong,
+ body[data-view="executive"] .hfc-execdash-class strong {font-size:16px;font-weight:750;font-variant-numeric:tabular-nums;color:#2f6972}
+ body[data-view="dashboard"] .hfc-execdash-classcol,
+ body[data-view="executive"] .hfc-execdash-classcol {height:170px;width:min(62px,68%);position:relative;overflow:hidden;border-radius:9px 9px 3px 3px;background:repeating-linear-gradient(to top,#edf3f3 0,#edf3f3 calc(25% - 1px),#cfdddf calc(25% - 1px),#cfdddf 25%)}
+ body[data-view="dashboard"] .hfc-execdash-classfill,
+ body[data-view="executive"] .hfc-execdash-classfill {position:relative;z-index:1;border-radius:8px 8px 2px 2px;background:linear-gradient(0deg,#347b84,#73aaa4)!important}
+ body[data-view="dashboard"] .hfc-execdash-class .hfc-execdash-classname,
+ body[data-view="executive"] .hfc-execdash-class .hfc-execdash-classname {max-width:100%;font-size:11px;line-height:1.45;color:#36535b}
+ body[data-view="dashboard"] .hfc-execdash-class small,
+ body[data-view="executive"] .hfc-execdash-class small {font-size:11px;color:#6b8085;font-variant-numeric:tabular-nums}
+ body[data-view="dashboard"] .hfc-execdash-source,
+ body[data-view="executive"] .hfc-execdash-source {font-size:11px;line-height:1.75;color:#5d7479;margin-top:12px}
+ body[data-view="dashboard"] .hfc-chart-viz svg text {font-family:'IBM Plex Sans Thai','Manrope',sans-serif;fill:#536d74;font-size:12px}
+ body[data-view="dashboard"] .hfc-chart-viz svg line {stroke:#d9e5e7}
+ body[data-view="dashboard"] .hfc-chart-note,
+ body[data-view="dashboard"] .hfc-review-footer {font-size:11px;line-height:1.7;color:#61777c}
+ body[data-view="dashboard"] .hfc-countlabel,
+ body[data-view="dashboard"] .hfc-kpi-title {font-variant-numeric:tabular-nums}
+ @media(max-width:700px) {
+  body[data-view="dashboard"] .hfc-execdash-classes,
+  body[data-view="executive"] .hfc-execdash-classes {min-height:235px;gap:6px;padding:14px 5px 10px}
+  body[data-view="dashboard"] .hfc-execdash-classcol,
+  body[data-view="executive"] .hfc-execdash-classcol {height:145px;width:min(44px,75%)}
+  body[data-view="dashboard"] .hfc-execdash-class strong,
+  body[data-view="executive"] .hfc-execdash-class strong {font-size:13px}
+  body[data-view="dashboard"] .hfc-execdash-class .hfc-execdash-classname,
+  body[data-view="executive"] .hfc-execdash-class .hfc-execdash-classname {font-size:10px}
+  body[data-view="dashboard"] .hfc-execdash-class small,
+  body[data-view="executive"] .hfc-execdash-class small {font-size:9px}
+  body[data-view="dashboard"] .hfc-execdash-row,
+  body[data-view="executive"] .hfc-execdash-row {padding:13px 12px}
+  body[data-view="dashboard"] .hfc-execdash-rownames strong,
+  body[data-view="executive"] .hfc-execdash-rownames strong {max-width:none!important;font-size:12px}
+  body[data-view="dashboard"] .hfc-execdash-rownames span,
+  body[data-view="executive"] .hfc-execdash-rownames span {font-size:11px}
+ }
+}
+@media print {
+ body[data-view="dashboard"] .hfc-execdash-row,body[data-view="executive"] .hfc-execdash-row,
+ body[data-view="dashboard"] .hfc-exec-summary-tile,body[data-view="executive"] .hfc-exec-summary-tile {break-inside:avoid;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ body[data-view="dashboard"] .hfc-execdash-track,body[data-view="dashboard"] .hfc-execdash-classcol {print-color-adjust:exact;-webkit-print-color-adjust:exact}
+}
+</style>
 </head>
 <body>
 <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -1482,7 +1581,7 @@ function hfcGdmtAppropriatenessChart(summary){
 /* Verified aggregate-only values sourced from Executive_Dashboard.
    IMPORTANT: these are NOT the filtered getDashboard calculations; never
    overwrite this section from getDashboard. No HN, patient names or CID. */
-const HF_WEB_BUILD='2026.10.17.3';
+const HF_WEB_BUILD='2026.10.17.4';
 const HFC_EXECUTIVE_SNAPSHOT={"schemaVersion":2,"source":"Executive_Dashboard","mode":"published","verifiedFrom":"Google Sheets aggregate cells","checkedAt":"2026-10-17","asOf":"ข้อมูลสรุปจาก Google Sheets ณ 17/10/2026 • ช่วงวันที่ของ KPI อื่นอ้างอิงตามชีตต้นฉบับ","note":"ไฟล์ JSON นี้เป็นข้อมูลสำรอง ณ วันที่ตรวจ ไม่ใช่การเชื่อมต่อสด; อัตรา FMT eligibility คิดจากทุกแถวมี HN และมีค่า AV โดยนับ HN ซ้ำทั้งเศษและส่วน","registry":{"registeredShown":273,"octoberVisits":75,"octoberUnique":70,"mtdNumerator":268,"mtdDenominator":273,"mtdPct":98.16849816849816,"mtdCountDifference":0},"eligibility":{"numerator":258,"denominator":272,"pct":94.85294117647058,"pending":14,"missing":1,"unit":"visits","sourceColumn":"HF_Patient_Data!AV6:AV1098","basis":"All rows with nonblank HN and FMT eligibility value; duplicate HN counted"},"kpis":[{"label":"ความครบถ้วนของ FMT / GDMT","actual":79.3103448275862,"target":60,"description":"46/58 • ครั้งบริการ HFrEF ที่เข้าเกณฑ์ประเมิน (eligible-adjusted)","status":"ผ่านเกณฑ์","sourceRow":14,"unit":"percent","lowerIsBetter":false},{"label":"ร้อยละรายการรับบริการที่บันทึกถึง MTD (นับ HN ซ้ำ)","actual":98.16849816849816,"target":60,"description":"ตัวเศษ 268 ครั้งที่ตอบ MTD=ใช่ / ตัวหาร 273 ครั้งที่มี HN • รวม HN ซ้ำทั้งคู่ (*ต้องยืนยันเกณฑ์เป้าหมายรายครั้ง)","status":"ถึงเกณฑ์เชิงตัวเลข*","sourceRow":15,"unit":"percent","lowerIsBetter":false},{"label":"ความร่วมมือในการใช้ยา","actual":96.96969696969697,"target":80,"description":"64/66 • ครั้งบริการที่มีผลการประเมิน adherence","status":"ผ่านเกณฑ์","sourceRow":16,"unit":"percent","lowerIsBetter":false},{"label":"การแก้ไข DRP สำเร็จ • คิดต่อเหตุการณ์จาก DRP_Log","actual":100,"target":80,"description":"แก้ไขสำเร็จ 7 / 7 เหตุการณ์ DRP • 01/10–17/10/2026","status":"ผ่านเกณฑ์","sourceRow":17,"unit":"percent","lowerIsBetter":false},{"label":"อัตรา ADR ที่สามารถป้องกันได้","actual":0,"target":5,"description":"0/75 • เหตุการณ์ preventable ADR ÷ ครั้งรับบริการ; ค่ายิ่งต่ำยิ่งดี","status":"ผ่านเกณฑ์ <5%","sourceRow":18,"unit":"percent","lowerIsBetter":true},{"label":"จำนวน DRP ที่พบ • นับเหตุการณ์ใน DRP_Log","actual":7,"target":null,"description":"บันทึก 7 เหตุการณ์ • ผู้ป่วย HN ไม่ซ้ำ 7 ราย • แก้ไขสำเร็จ 7 เหตุการณ์","status":"ข้อมูลจาก DRP_Log","sourceRow":19,"unit":"count","lowerIsBetter":false},{"label":"ความเหมาะสมตาม GDMT • เฉพาะครั้งที่ประเมิน","actual":100,"target":null,"description":"เหมาะสม 75 / ไม่เหมาะสม 0 • ประเมินแล้ว 75 ครั้ง • ยังไม่กำหนดเกณฑ์เป้าหมาย","status":"สรุปผล","sourceRow":20,"unit":"percent","lowerIsBetter":false},{"label":"FMT eligibility • เฉพาะครั้งที่มีผล (นับ HN ซ้ำ)","actual":94.85294117647058,"target":null,"description":"Eligible 258 / มีผลประเมิน 272 ครั้ง • ทุก HN รวม HN ซ้ำทั้งตัวเศษและตัวหาร • สถานะต้องประเมินเพิ่มรวมในตัวหาร","status":"สรุป eligibility","sourceRow":21,"unit":"percent","lowerIsBetter":false}],"gdmt":[{"label":"ACEi / ARB / ARNI","percent":85,"received":34,"assessed":40,"sourceRow":34},{"label":"β-blocker","percent":100,"received":52,"assessed":52,"sourceRow":35},{"label":"MRA","percent":76,"received":19,"assessed":25,"sourceRow":36},{"label":"SGLT2i","percent":75,"received":3,"assessed":4,"sourceRow":37}],"sourceCoordinates":{"registry":"Executive_Dashboard!A6:M6","kpis":"Executive_Dashboard!A14:E21","gdmt":"Executive_Dashboard!A34:D37","mtd":"_Executive_Metrics!B2:B4","eligibility":"Dashboard!B31:D31"}};
 let HFC_EXECUTIVE_FEED=HFC_EXECUTIVE_SNAPSHOT,HFC_EXEC_FEED_LOADED=false,HFC_EXEC_FEED_LOADING=false,HFC_EXEC_FEED_CHECKED=null,HFC_EXEC_FEED_SOURCE='snapshot',HFC_EXEC_FEED_ERROR='';
 function hfcExecKpis(){return (HFC_EXECUTIVE_FEED.kpis||[]).map(r=>({...r}));}
