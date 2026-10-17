@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS hf_visit (
   visit_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  synthetic_patient_key TEXT NOT NULL,
+  synthetic_patient_key TEXT NOT NULL
+    CHECK (synthetic_patient_key ~ '^SYN-[0-9]{5,}$'),
   visit_date DATE NOT NULL,
   phenotype TEXT NOT NULL CHECK (phenotype IN ('HFrEF', 'HFpEF', 'Unclassified')),
   gdmt_appropriateness TEXT NOT NULL CHECK (
