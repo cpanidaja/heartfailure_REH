@@ -12,7 +12,7 @@ Measure whether indexed PostgreSQL aggregates on Cloud SQL reduce backend respon
 - `seed.sql`: deterministic synthetic data generator (10,000 rows by default; change the series upper bound for larger trials).
 - `service.py`: read-only aggregate endpoint.
 - `benchmark.py`: reports median and p95 HTTP latency.
-- `test_service.py`: local tests for aggregate calculations.
+- `summary.py` and `test_summary.py`: testable response formatting logic.
 
 The schema preserves repeated visits as separate rows. It uses synthetic keys only. Field names and calculations are a benchmark fixture, not a replacement for the approved production data dictionary.
 
@@ -28,8 +28,7 @@ The schema preserves repeated visits as separate rows. It uses synthetic keys on
 ## Local checks
 
 ```sh
-python -m pip install -r requirements.txt
-python -m unittest -v
+python -m unittest -v cloud-pilot/test_summary.py
 ```
 
 The unit tests validate response calculations without requiring Google Cloud. Actual Cloud SQL latency can only be measured after a pilot instance and Cloud Run service exist.
