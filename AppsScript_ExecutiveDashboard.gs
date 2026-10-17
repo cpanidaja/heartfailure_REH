@@ -97,6 +97,11 @@ function hfReadExecutiveDashboardSummary_() {
       sourceRow:row,unit:isCount?'count':'percent',
       lowerIsBetter:row===18};
   });
+  if (count(reg[0], 'Executive_Dashboard!A6') !== denominator ||
+      eligibilityDenominator > denominator ||
+      denominator - eligibilityDenominator < 0) {
+    throw new Error('EXEC_DASHBOARD_BASIS_MISMATCH: MTD และ FMT eligibility ต้องอ้างอิงระเบียนที่มี HN ทั้งทะเบียน');
+  }
   if (Math.abs(kpis[7].actual - eligibilityPct)>0.011) {
     throw new Error('EXEC_DASHBOARD_ELIGIBILITY_MISMATCH: Executive_Dashboard!B21 ไม่ตรง Dashboard!D31');
   }
@@ -106,6 +111,7 @@ function hfReadExecutiveDashboardSummary_() {
 
   return {
     schemaVersion:2,
+    definitionVersion:'HF-ALL-ROWS-20261017',
     source:'Executive_Dashboard',
     mode:'live',
     checkedAt:Utilities.formatDate(new Date(),timeZone,"yyyy-MM-dd'T'HH:mm:ss"),
@@ -137,4 +143,89 @@ function hfReadExecutiveDashboardSummary_() {
       eligibility:'Dashboard!B31:D31'
     }
   };
+}
+
+
+/**
+ * Read aggregate GDMT status from every registry row with a nonempty HN.
+ *
+ * All four drug limitation classes and BB appropriateness use the SAME
+ * all-registry denominator; duplicates count as separate visit records.
+ * This intentionally ignores dashboard date/clinic filters and MUST be shown
+ * as "ทั้งทะเบียน" in the UI. No names/HNs/row-level records leave Apps Script.
+ * Dispatch only AFTER authentication:
+ *
+ *   case 'getGdmtReviewSummary':
+ *     return hfReadGdmtReviewSummary_();
+ */
+function hfReadGdmtReviewSummary_() {
+  const SPREADSHEET_ID = '11JO_Cnil70XzP7ACDmW00IPYvtS0QCwPhRuftFYts7U';
+  const book = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = book.getSheetByName('HF_Patient_Data');
+  if (!sheet) {
+    throw new Error('HF_GDMT_MISSING: ไม่พบแท็บ HF_Patient_Data');
+  }
+
+  const startRow = 6;
+  const endRow = Math.min(sheet.getMaxRows(), Math.max(5, sheet.getLastRow()));
+  const length = Math.max(0, endRow - startRow + 1);
+  const rows = length
+    ? sheet.getRange(startRow, 2, length, 53).getDisplayValues() // B:BB
+    : [];
+  // Offset inside B:BB: D=2, I=7, L=10, O=13, R=16, AU=45, BB=52
+  // B is index 0, BB is column 54 (index 52). Do not read/display E (name).
+  const result = {
+    schemaVersion:2,
+    definitionVersion:'HF-ALL-ROWS-20261017',
+    source:'HF_Patient_Data',
+    field:'BB',
+    readMode:'live-aggregate',
+    mode:'live',
+    scope:'all_registry',
+    asOf:Utilities.formatDate(new Date(), book.getSpreadsheetTimeZone() || 'Asia/Bangkok',"yyyy-MM-dd'T'HH:mm:ss"),
+    visits:0,
+    limitations:[0,0,0,0],
+    assessed:0,
+    appropriate:0,
+    inappropriate:0,
+    pending:0,
+    unrecognized:0,
+    bbDetected:true,
+    constraintsDetected:true,
+    phenotypes:{
+      HFrEF:{good:0,bad:0},
+      HFpEF:{good:0,bad:0}
+    }
+  };
+  for (var i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const hn = String(row[2] == null ? '' : row[2]).trim(); // D
+    if (!hn) continue;
+    result.visits++;
+    [7,10,13,16].forEach(function(index,j) {
+      if (String(row[index] == null ? '' : row[index]).trim() === 'ข้อจำกัด') {
+        result.limitations[j]++;
+      }
+    });
+    const assessment = String(row[52] == null ? '' : row[52]).trim(); // BB
+    const phenotype = String(row[45] == null ? '' : row[45]).trim(); // AU
+    if (assessment === 'เหมาะสม' || assessment === 'ไม่เหมาะสม') {
+      result.assessed++;
+      if (assessment === 'เหมาะสม') {
+        result.appropriate++;
+        if (result.phenotypes[phenotype]) result.phenotypes[phenotype].good++;
+      } else {
+        result.inappropriate++;
+        if (result.phenotypes[phenotype]) result.phenotypes[phenotype].bad++;
+      }
+    } else {
+      result.pending++;
+      if (assessment) result.unrecognized++;
+    }
+  }
+  if (result.visits !== result.assessed + result.pending ||
+      result.assessed !== result.appropriate + result.inappropriate) {
+    throw new Error('HF_GDMT_INVARIANT: จำนวนครั้งบริการไม่สอดคล้อง');
+  }
+  return result;
 }
