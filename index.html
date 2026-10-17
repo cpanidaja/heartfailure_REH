@@ -1392,151 +1392,65 @@ const HFC_GDMT_VERIFIED_SNAPSHOT={
  phenotypes:{HFrEF:{good:217,bad:0},HFpEF:{good:18,bad:0}},
  note:'ข้อมูลทั้งทะเบียน ณ 17 ต.ค. 2569 นับ HN ซ้ำรายแถว; อ้างอิงผลตามคอลัมน์ BB ที่บันทึก ไม่ถือเป็นการยืนยันความเหมาะสมโดยเภสัชกร'
 };
+// Both GDMT charts use exactly the SAME source and all-registry scope.
+// Never mix a filtered legacy API graph with an unfiltered snapshot.
 function hfcGdmtBackupNote(reason){
- return '<div class="hfc-review-backup" role="status"><strong>แสดงข้อมูลสำรองจาก Google Sheets · ไม่ใช่ข้อมูลสด</strong>'
-   +'ข้อมูลทั้งทะเบียนที่ตรวจสอบล่าสุด ณ 17 ต.ค. 2569 <b>ไม่เปลี่ยนตามตัวกรองวันที่/คลินิก</b> · '
-   +'ขณะนี้ Apps Script ยังไม่ส่งฟิลด์ที่จำเป็นให้เว็บไซต์ครบ'
-   +(reason?'<span class="hfc-review-backup-small">'+esc(reason)+'</span>':'')+'</div>';
-}
-
-// Keep only de-identified rendered GDMT aggregates in tab memory for five minutes.
-const HFC_REVIEW_RENDER_CACHE=new Map(),HFC_REVIEW_RENDER_CACHE_MS=300000;
-function hfcReviewCacheKey(filters){return JSON.stringify([filters?.start||'',filters?.end||'',filters?.clinic||'ทั้งหมด']);}
-function hfcBindReviewCharts(version,filters){
- const button=document.getElementById('hfcReviewRefresh'),status=document.getElementById('hfcReviewStatus');
- if(!button)return;
- const key=hfcReviewCacheKey(filters),cached=HFC_REVIEW_RENDER_CACHE.get(key);
- if(cached&&Date.now()-cached.at<HFC_REVIEW_RENDER_CACHE_MS){
-  const a=document.getElementById('hfcContraindications'),b=document.getElementById('hfcGdmtAppropriateness');
-  if(a)a.innerHTML=cached.limitations;
-  if(b)b.innerHTML=cached.assessment;
-  if(status)status.textContent='แสดงผลสรุปที่โหลดไว้ภายใน 5 นาที · กดปุ่มเพื่ออัปเดตข้อมูลสด';
- }
- button.onclick=async()=>{
-  if(!hfcReviewValid(version)||button.disabled)return;
-  button.disabled=true;
-  if(status)status.textContent='กำลังประมวลผลกราฟสดตามตัวกรอง…';
-  clearApiCache();
-  try{
-   await hfcLoadReviewCharts(version,filters);
-   if(!hfcReviewValid(version))return;
-   const a=document.getElementById('hfcContraindications'),b=document.getElementById('hfcGdmtAppropriateness');
-   const fallback=Boolean(a?.querySelector('.hfc-review-backup')||b?.querySelector('.hfc-review-backup'));
-   if(!fallback&&a&&b){
-    if(HFC_REVIEW_RENDER_CACHE.size>=5)HFC_REVIEW_RENDER_CACHE.delete(HFC_REVIEW_RENDER_CACHE.keys().next().value);
-    HFC_REVIEW_RENDER_CACHE.set(key,{at:Date.now(),limitations:a.innerHTML,assessment:b.innerHTML});
-   }
-   if(status)status.textContent=fallback?'ข้อมูลสดยังไม่พร้อม · กราฟสำรองมีวันที่กำกับ':'โหลดกราฟ GDMT ล่าสุดแล้ว · กดปุ่มเพื่ออัปเดตอีกครั้ง';
-  }finally{if(hfcReviewValid(version))button.disabled=false;}
- };
-}
-function hfcCreateReviewAccumulator(){
- return {source:'HF_Patient_Data',field:'BB',visits:0,rowsReceived:0,bbDetected:false,constraintsDetected:false,limitations:[0,0,0,0],assessed:0,appropriate:0,inappropriate:0,pending:0,unrecognized:0,phenotypes:{HFrEF:{good:0,bad:0},HFpEF:{good:0,bad:0}},readMode:'preview'};
-}
-function hfcApplyReviewRows(out,rows){
- const list=Array.isArray(rows)?rows:[],cols=['I','L','O','R'];
- const bbAvailable=list.some(r=>Object.prototype.hasOwnProperty.call(r?.values||{},'BB'));
- const limitationAvailable=cols.every(c=>list.some(r=>Object.prototype.hasOwnProperty.call(r?.values||{},c)));
- out.bbDetected=out.bbDetected||bbAvailable;
- out.constraintsDetected=out.constraintsDetected||limitationAvailable;
- list.forEach(row=>{
-  const v=row&&row.values||{},hn=String(v.D??'').trim();
-  out.rowsReceived++;
-  if(!hn)return;
-  out.visits++;
-  if(limitationAvailable)cols.forEach((c,i)=>{if(String(v[c]??'').trim()==='ข้อจำกัด')out.limitations[i]++;});
-  if(bbAvailable){
-   const assessment=String(v.BB??'').trim(),phen=String(v.AU??'').trim();
-   if(assessment==='เหมาะสม'){out.appropriate++;out.assessed++;if(out.phenotypes[phen])out.phenotypes[phen].good++;}
-   else if(assessment==='ไม่เหมาะสม'){out.inappropriate++;out.assessed++;if(out.phenotypes[phen])out.phenotypes[phen].bad++;}
-   else {out.pending++;if(assessment!=='')out.unrecognized++;}
-  }
- });
- return out;
+ return '<div class="hfc-review-backup" role="status"><strong>ข้อมูลสำรอง ณ '+esc(HFC_GDMT_VERIFIED_SNAPSHOT.asOf)+' · ไม่ใช่ข้อมูลสด</strong>'
+  +'ใช้ทุกครั้งบริการที่มี HN รวม HN ซ้ำ • ไม่เปลี่ยนตามตัวกรองวัน/คลินิก'
+  +(reason?'<span class="hfc-review-backup-small">'+esc(reason)+'</span>':'')+'</div>';
 }
 function hfcReviewValid(version){return version===state.requestVersion&&state.view==='dashboard';}
-function hfcReviewProgress(done,total){
- const el=document.getElementById('hfcGdmtAppropriateness');
- if(el&&done>0&&done%12===0)el.innerHTML='<div class="hfc-review-status">กำลังตรวจคอลัมน์ BB จากระเบียนเต็มใน HF_Patient_Data · '+fmt(done)+' / '+fmt(total)+' ระเบียน</div>';
+function hfcReviewAggregateValid(v){
+ if(!v||v.schemaVersion!==2||v.definitionVersion!=='HF-ALL-ROWS-20261017'||
+ v.source!=='HF_Patient_Data'||v.field!=='BB'||v.scope!=='all_registry'||
+ v.readMode!=='live-aggregate'||v.mode!=='live'||!v.bbDetected||!v.constraintsDetected||
+ !v.phenotypes||!Array.isArray(v.limitations)||v.limitations.length!==4)return false;
+ const count=n=>typeof n==='number'&&Number.isSafeInteger(n)&&n>=0;
+ if(![v.visits,v.assessed,v.appropriate,v.inappropriate,v.pending,v.unrecognized||0,...v.limitations].every(count))return false;
+ if(v.assessed+v.pending!==v.visits||v.appropriate+v.inappropriate!==v.assessed||
+   v.limitations.some(n=>n>v.visits)||(v.unrecognized||0)>v.pending)return false;
+ return ['HFrEF','HFpEF'].every(p=>v.phenotypes[p]&&count(v.phenotypes[p].good)&&
+ count(v.phenotypes[p].bad)&&v.phenotypes[p].good+v.phenotypes[p].bad<=v.assessed);
 }
-async function hfcFetchReviewSummary(filters,version){
- const f={start:filters?.start||'',end:filters?.end||'',clinic:filters?.clinic||'ทั้งหมด',query:''};
- const maxPages=60,requestedBatch=150,previews=[];
- let totalExpected=null,reportedPages=1,observedBatch=0;
- for(let page=1;page<=maxPages;page++){
-  if(!hfcReviewValid(version))return null;
-  const response=await api('listRecords','HF_Patient_Data',f,page,requestedBatch);
-  if(!hfcReviewValid(version))return null;
-  if(!response||!Array.isArray(response.rows))throw new Error('ไม่สามารถอ่านทะเบียน HF_Patient_Data ผ่าน Apps Script');
-  if(Number.isFinite(Number(response.total))&&response.total!==''&&response.total!==null)totalExpected=Number(response.total);
-  if(Number(response.pages)>0)reportedPages=Number(response.pages);
-  if(page===1)observedBatch=Math.max(1,Number(response.pageSize)||response.rows.length||requestedBatch);
-  previews.push(...response.rows);
-  if(!response.rows.length)break;
-  const pages=Math.max(reportedPages,totalExpected===null?1:Math.ceil(totalExpected/observedBatch));
-  if(page>=pages)break;
-  if(page===maxPages)throw new Error('จำนวนระเบียนเกินขอบเขตการโหลด กำหนดช่วงวันที่ให้สั้นลง');
+function hfcReviewPaint(summary,isLive,why){
+ const a=document.getElementById('hfcContraindications'),
+ b=document.getElementById('hfcGdmtAppropriateness'),
+ status=document.getElementById('hfcReviewStatus');
+ if(!a||!b)return;
+ const lead=isLive
+  ?'<div class="hfc-review-head"><strong>ข้อมูลสดจาก Google Sheets · ทั้งทะเบียน</strong> • '+esc(summary.asOf||'')+'</div>'
+  :hfcGdmtBackupNote(why||'กำลังตรวจสอบ Apps Script');
+ a.innerHTML=lead+hfcConstraintReviewChart(summary);
+ b.innerHTML=lead+hfcGdmtAppropriatenessChart(summary);
+ if(status)status.textContent=isLive
+  ?'ข้อมูลสด ✓ · ทุกครั้งที่มี HN รวม HN ซ้ำ · '+String(summary.asOf||'')
+  :'ข้อมูลสำรอง ณ '+HFC_GDMT_VERIFIED_SNAPSHOT.asOf+' · ทั้งทะเบียน • ข้อมูลสดยังไม่พร้อม';
+}
+async function hfcLoadReviewCharts(version){
+ const btn=document.getElementById('hfcReviewRefresh');
+ if(!hfcReviewValid(version)||!sessionToken||btn?.disabled)return;
+ if(btn)btn.disabled=true;
+ const status=document.getElementById('hfcReviewStatus');
+ if(status)status.textContent='กำลังอ่านผลรวม GDMT จาก Google Sheets…';
+ try{
+  // Aggregated RPC only; never download per-patient records for a public chart.
+  const data=await api('getGdmtReviewSummary');
+  if(!hfcReviewValid(version))return;
+  if(!hfcReviewAggregateValid(data))throw new Error('โค้ด Apps Script ยังไม่รองรับรายงานตามนิยามล่าสุด');
+  hfcReviewPaint(data,true);
+ }catch(e){
+  if(hfcReviewValid(version))hfcReviewPaint(HFC_GDMT_VERIFIED_SNAPSHOT,false,'Apps Script ยังไม่ Deploy ตัวอ่านผลรวมใหม่ หรือเชื่อมต่อไม่สำเร็จ');
+ }finally{
+  const button=document.getElementById('hfcReviewRefresh');
+  if(hfcReviewValid(version)&&button)button.disabled=false;
  }
- if(totalExpected!==null&&previews.length<totalExpected)throw new Error('โหลดทะเบียนไม่ครบ: '+fmt(previews.length)+' / '+fmt(totalExpected)+' ระเบียน');
- const result=hfcCreateReviewAccumulator();
- if(!previews.length)return result;
- // Apps Script listRecords generally returns schema.preview, NOT the complete A:BB.
- const showBB=previews.some(r=>Object.prototype.hasOwnProperty.call(r.values||{},'BB'));
- const showLimitations=['I','L','O','R'].every(k=>previews.some(r=>Object.prototype.hasOwnProperty.call(r.values||{},k)));
- if(showBB&&showLimitations){hfcApplyReviewRows(result,previews);return result;}
- // getRecord is the already-authenticated full-record method used by Edit/View.
- // Probe before hydrating every row; some older deployments omit BB even here.
- const candidates=previews.filter(r=>Number.isFinite(Number(r.row))&&Number(r.row)>0);
- if(!candidates.length)throw new Error('เซิร์ฟเวอร์ไม่ได้ระบุเลขแถวสำหรับอ่านระเบียนเต็ม');
- let probe=null,probeRef=null,detailBB=showBB,detailLimits=showLimitations;
- for(const candidate of candidates.slice(0,4)){
-  if(!hfcReviewValid(version))return null;
-  const record=await api('getRecord','HF_Patient_Data',Number(candidate.row));
-  if(!hfcReviewValid(version))return null;
-  if(!record||typeof record.values!=='object')continue;
-  probe=record;probeRef=candidate;
-  if(Object.prototype.hasOwnProperty.call(record.values,'BB'))detailBB=true;
-  if(['I','L','O','R'].some(c=>Object.prototype.hasOwnProperty.call(record.values,c)))detailLimits=true;
-  if(detailBB&&detailLimits)break;
- }
- if(!detailBB&&!detailLimits){
-  hfcApplyReviewRows(result,previews);
-  result.readMode='backend-fields-omitted';
-  return result;
- }
- // If preview already contains all limitation statuses, show its chart immediately.
- // An older Apps Script deployment may still omit BB from getRecord; don't block the limitation chart.
- if(!detailBB&&showLimitations){
-  hfcApplyReviewRows(result,previews);
-  result.readMode='limitations-preview-only';
-  return result;
- }
- // Only hydrate detail when essential fields are unavailable in the preview.
- const needDetail=!showBB||!showLimitations;
- let rows=previews;
- if(needDetail){
-  const hydrated=new Array(previews.length);
-  const total=previews.length;
-  let index=0,completed=0;
-  async function worker(){
-   while(index<previews.length&&hfcReviewValid(version)){
-    const i=index++,ref=previews[i];
-    const p=ref===probeRef?probe:await api('getRecord','HF_Patient_Data',Number(ref.row));
-    if(!hfcReviewValid(version))return;
-    // Keep the preview's date/phenotype keys as a fallback; do not render patient details.
-    hydrated[i]={row:ref.row,values:{...(ref.values||{}),...(p?.values||{})}};
-    completed++;
-    hfcReviewProgress(completed,total);
-   }
-  }
-  await Promise.all(Array.from({length:Math.min(4,total)},()=>worker()));
-  if(!hfcReviewValid(version))return null;
-  if(hydrated.some(r=>!r))throw new Error('โหลดรายละเอียดระเบียนไม่ครบ โปรดรีเฟรช Dashboard');
-  rows=hydrated;
-  result.readMode='full-record';
- }
- hfcApplyReviewRows(result,rows);
- return result;
+}
+function hfcBindReviewCharts(version){
+ const btn=document.getElementById('hfcReviewRefresh');
+ if(!btn)return;
+ hfcReviewPaint(HFC_GDMT_VERIFIED_SNAPSHOT,false,'กำลังตรวจสอบข้อมูลสด');
+ btn.onclick=()=>hfcLoadReviewCharts(version);
+ void hfcLoadReviewCharts(version);
 }
 function hfcConstraintReviewChart(summary){
  if(!summary||!summary.visits)return hfcEmpty('ไม่พบระเบียนที่มี HN ในช่วงวันที่หรือคลินิกนี้');
@@ -1555,23 +1469,9 @@ function hfcGdmtAppropriatenessChart(summary){
  return draw+'<div class="hfc-review-subheading">ความเหมาะสมในรายที่ประเมินแล้ว แยกตาม HF phenotype</div><div class="hfc-review-pheno">'+ph+'</div>'
   +'<div class="hfc-review-footer">'+(isBackup?'สำรองจาก HF_Patient_Data!BB ณ 13 ต.ค. 2569 · รวมระเบียนทั้งทะเบียน ไม่ใช่รายงานช่วงวันที่ที่เลือก':'ข้อมูลสดจาก HF_Patient_Data!BB หลังเข้าสู่ระบบ · นับตามช่วงวันที่/คลินิกที่เลือก')+' • เหมาะสม ÷ (เหมาะสม + ไม่เหมาะสม) • ไม่รวมที่ยังไม่ประเมินในตัวหาร • แยกจาก GDMT prescribing และ MTD</div>';
 }
-async function hfcLoadReviewCharts(version,filters){
- const targets=[document.getElementById('hfcContraindications'),document.getElementById('hfcGdmtAppropriateness')];
- if(targets.some(t=>!t))return;
- try{
-  const data=await hfcFetchReviewSummary(filters,version);
-  if(!data||version!==state.requestVersion||state.view!=='dashboard')return;
-  const a=document.getElementById('hfcContraindications'),b=document.getElementById('hfcGdmtAppropriateness');
-  if(a)a.innerHTML=data.constraintsDetected?hfcConstraintReviewChart(data):hfcGdmtBackupNote('สถานะข้อจำกัด I/L/O/R ไม่อยู่ใน API')+hfcConstraintReviewChart(HFC_GDMT_VERIFIED_SNAPSHOT);
-  if(b)b.innerHTML=data.bbDetected?hfcGdmtAppropriatenessChart(data):hfcGdmtBackupNote('ผลประเมิน BB ไม่อยู่ใน API')+hfcGdmtAppropriatenessChart(HFC_GDMT_VERIFIED_SNAPSHOT);
- }catch(e){
-  if(version!==state.requestVersion||state.view!=='dashboard')return;
-  const message='<div class="hfc-review-status"><strong>ยังไม่สามารถโหลดข้อมูลการประเมินได้</strong>ตรวจสอบสิทธิ์บัญชี/การเชื่อมต่อ Apps Script แล้วกดรีเฟรช Dashboard • '+esc(String(e.message||'เกิดข้อผิดพลาด'))+'</div>';
-  const n1=document.getElementById('hfcContraindications'),n2=document.getElementById('hfcGdmtAppropriateness');
-  if(n1)n1.innerHTML=hfcGdmtBackupNote('ไม่สามารถอ่านข้อมูลสดจาก Apps Script ได้')+hfcConstraintReviewChart(HFC_GDMT_VERIFIED_SNAPSHOT);
-  if(n2)n2.innerHTML=hfcGdmtBackupNote('ไม่สามารถอ่านข้อมูลสดจาก Apps Script ได้')+hfcGdmtAppropriatenessChart(HFC_GDMT_VERIFIED_SNAPSHOT);
- }
-}
+
+
+/* Replicas of the two native charts
 
 
 /* Replicas of the two native charts in the Google Sheets Executive_Dashboard.
