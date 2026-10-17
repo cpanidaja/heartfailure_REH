@@ -1386,15 +1386,15 @@ function hfcQualityChart(quality){
    Public GitHub code contains no HNs, names, medications or patient-level records.
    This is NOT live, and NEVER follows the date/clinic filter. */
 const HFC_GDMT_VERIFIED_SNAPSHOT={
- source:'HF_Patient_Data',field:'BB',asOf:'13 ต.ค. 2569',readMode:'sheet-snapshot',
- visits:262,limitations:[41,12,88,154],assessed:197,appropriate:197,inappropriate:0,
- pending:65,bbDetected:true,constraintsDetected:true,
- phenotypes:{HFrEF:{good:176,bad:0},HFpEF:{good:17,bad:0}},
- note:'ข้อมูลทั้งทะเบียน ณ 13 ต.ค. 2569 รวมแถวที่ไม่ได้ระบุวันที่รับบริการและแถวที่เป็นนัดในอนาคต'
+ source:'HF_Patient_Data',field:'BB',asOf:'17 ต.ค. 2569',readMode:'sheet-snapshot',
+ visits:273,limitations:[56,17,116,218],assessed:273,appropriate:273,inappropriate:0,
+ pending:0,bbDetected:true,constraintsDetected:true,
+ phenotypes:{HFrEF:{good:217,bad:0},HFpEF:{good:18,bad:0}},
+ note:'ข้อมูลทั้งทะเบียน ณ 17 ต.ค. 2569 นับ HN ซ้ำรายแถว; อ้างอิงผลตามคอลัมน์ BB ที่บันทึก ไม่ถือเป็นการยืนยันความเหมาะสมโดยเภสัชกร'
 };
 function hfcGdmtBackupNote(reason){
  return '<div class="hfc-review-backup" role="status"><strong>แสดงข้อมูลสำรองจาก Google Sheets · ไม่ใช่ข้อมูลสด</strong>'
-   +'ข้อมูลทั้งทะเบียนที่ตรวจสอบล่าสุด ณ 13 ต.ค. 2569 <b>ไม่เปลี่ยนตามตัวกรองวันที่/คลินิก</b> · '
+   +'ข้อมูลทั้งทะเบียนที่ตรวจสอบล่าสุด ณ 17 ต.ค. 2569 <b>ไม่เปลี่ยนตามตัวกรองวันที่/คลินิก</b> · '
    +'ขณะนี้ Apps Script ยังไม่ส่งฟิลด์ที่จำเป็นให้เว็บไซต์ครบ'
    +(reason?'<span class="hfc-review-backup-small">'+esc(reason)+'</span>':'')+'</div>';
 }
