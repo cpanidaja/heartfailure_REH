@@ -4,6 +4,8 @@ from contextlib import contextmanager
 import psycopg
 from fastapi import FastAPI, HTTPException
 
+from summary import make_summary
+
 app = FastAPI(title="HF Clinic Synthetic Performance Pilot", docs_url=None, redoc_url=None)
 
 
@@ -53,19 +55,4 @@ def summary():
             row = cur.fetchone()
     except Exception as exc:
         raise HTTPException(status_code=503, detail="Database unavailable") from exc
-
-    visits, unique_patients, eligible, assessed, appropriate, inappropriate = row
-    return {
-        "visits": visits,
-        "uniquePatients": unique_patients,
-        "fmtEligibility": {
-            "numerator": eligible,
-            "denominator": assessed,
-            "percent": round(100 * eligible / assessed, 2) if assessed else 0,
-        },
-        "gdmtAppropriateness": {
-            "appropriate": appropriate,
-            "inappropriate": inappropriate,
-        },
-        "dataClass": "synthetic-only",
-    }
+    return make_summary(row)
