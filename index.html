@@ -1267,30 +1267,52 @@ body[data-view="dashboard"] .legend i[style]{background:#84a9ac!important}
  body[data-view="dashboard"] .hfc-execdash-track,body[data-view="dashboard"] .hfc-execdash-classcol {print-color-adjust:exact;-webkit-print-color-adjust:exact}
 }
 
-/* Roiet HF Clinic · calm green + dimensional charts */
+/* Roiet HF Clinic · minimal emerald theme */
 :root{
- --bg:#f3f8f5;--surface:#fff;--ink:#20382d;--muted:#63776c;--line:#dce9e1;
- --teal:#167a53;--teal-light:#e8f4ed;--navy:#244b39;--orange:#a8793f;--red:#b95b61;
- --shadow:0 8px 24px #173e2b0d;--radius:18px
+ --bg:#f5faf7;--surface:#fff;--ink:#1e382b;--muted:#64786d;--line:#d8e9df;
+ --teal:#087d50;--teal-light:#e9f6ee;--navy:#173b2d;--orange:#b48a4f;--red:#c25c63;
+ --shadow:0 5px 20px #174c3210;--radius:18px
 }
-body{background:var(--bg);color:var(--ink)}
-.btn{background:#fff;border:1px solid #c9ddd0;color:#345d47;border-radius:12px;box-shadow:0 2px 6px #173e2b0a;transition:background .18s,border-color .18s,box-shadow .18s,transform .18s}
-.btn:hover{background:#f1f8f3;border-color:#a8cbb5;color:#244f39;box-shadow:0 5px 14px #1b694012;transform:translateY(-1px)}
-.btn-primary{background:linear-gradient(135deg,#39ad7a 0%,#168257 100%);border-color:#258c60;color:#fff;box-shadow:0 5px 12px #176b4620,inset 0 1px 0 #ffffff66}
-.btn-primary:hover{background:linear-gradient(135deg,#43b985 0%,#16764f 100%);border-color:#1d8358;color:#fff;box-shadow:0 7px 16px #176b4626}
-.btn-ghost{background:transparent;border-color:transparent;color:#4e705b;box-shadow:none}
-button:focus-visible,a:focus-visible{outline:3px solid #54a77a;outline-offset:3px}
-body[data-view] :is(.main,.modal) .btn{background:#fff;border-color:#c9ddd0;color:#345d47;box-shadow:0 2px 6px #173e2b0a}
-body[data-view] :is(.main,.modal) .btn:hover{background:#f1f8f3;border-color:#a8cbb5;color:#244f39;box-shadow:0 5px 14px #1b694012}
-body[data-view] :is(.main,.modal) .btn-primary{background:linear-gradient(135deg,#39ad7a 0%,#168257 100%);border-color:#258c60;color:#fff;box-shadow:0 5px 12px #176b4620,inset 0 1px 0 #ffffff66}
-body[data-view] :is(.main,.modal) .btn-primary:hover{background:linear-gradient(135deg,#43b985 0%,#16764f 100%);border-color:#1d8358;color:#fff;box-shadow:0 7px 16px #176b4626}
-body[data-view] :is(.main,.modal) .btn-ghost{background:transparent;border-color:transparent;color:#4e705b;box-shadow:none}
-.chart text{fill:#64796c}.chart .axis{stroke:#e0ebe4}
-.panel,.stat,.toolbar{box-shadow:0 8px 24px #173e2b0d}
-.hfc-execdash-track,.hfc-review-track,.hfc-counttrack,.hfc-kpi-track{background:linear-gradient(180deg,#e5eee8,#f0f6f2);box-shadow:inset 0 2px 4px #234b3510,inset 0 -1px 0 #ffffff}
-.hfc-execdash-bar,.hfc-execdash-classfill,.hfc-review-fill,.hfc-countfill,.hfc-kpi-fill{background-image:linear-gradient(180deg,#ffffff42 0%,#ffffff0a 38%,#123d291a 100%),linear-gradient(90deg,#238d61,#59b889);box-shadow:inset 0 1px 0 #ffffff8c,inset 0 -2px 3px #164c3026,0 2px 4px #174d3120;border:1px solid #ffffff40}
-.hfc-execdash-classfill{background-image:linear-gradient(90deg,#ffffff42 0%,#ffffff0a 42%,#123d291a 100%),linear-gradient(180deg,#5dbb8b,#20865a)}
-.hfc-execdash-target{background:#42604e;box-shadow:0 0 0 2px #ffffffad,0 1px 4px #1e382d30}
+.btn{
+ background:#fff;border:1px solid #c7dfd2;color:#365d49;border-radius:12px;
+ box-shadow:0 2px 6px #1c603c08;transition:background .18s,border-color .18s,box-shadow .18s,transform .18s
+}
+.btn:hover{background:#f2faf5;border-color:#9ecdb2;color:#245a3d;box-shadow:0 5px 14px #17855016;transform:translateY(-1px)}
+.btn-primary{
+ background:linear-gradient(135deg,#12ad70 0%,#078953 100%);border-color:#0a955a;color:#fff;
+ box-shadow:0 6px 16px #0789532a,inset 0 1px 0 #ffffff55
+}
+.btn-primary:hover{
+ background:linear-gradient(135deg,#18b978 0%,#087c4e 100%);border-color:#078953;color:#fff;
+ box-shadow:0 8px 20px #07895336
+}
+.btn-ghost{background:transparent;border-color:transparent;color:#4d725e;box-shadow:none}
+button:focus-visible,a:focus-visible{outline:3px solid #43ad78;outline-offset:3px}
+body[data-view] :is(.main,.modal) .btn{background:#fff;border-color:#c7dfd2;color:#365d49;box-shadow:0 2px 6px #1c603c08}
+body[data-view] :is(.main,.modal) .btn:hover{background:#f2faf5;border-color:#9ecdb2;color:#245a3d;box-shadow:0 5px 14px #17855016}
+body[data-view] :is(.main,.modal) .btn-primary{background:linear-gradient(135deg,#12ad70 0%,#078953 100%);border-color:#0a955a;color:#fff;box-shadow:0 6px 16px #0789532a,inset 0 1px 0 #ffffff55}
+body[data-view] :is(.main,.modal) .btn-primary:hover{background:linear-gradient(135deg,#18b978 0%,#087c4e 100%);border-color:#078953;color:#fff;box-shadow:0 8px 20px #07895336}
+body[data-view] :is(.main,.modal) .btn-ghost{background:transparent;border-color:transparent;color:#4d725e;box-shadow:none}
+.chart text{fill:#718479}
+.chart .axis{stroke:#e2eee7}
+.hfc-execdash-track,.hfc-review-track,.hfc-counttrack,.hfc-kpi-track{background:#edf5f0}
+.hfc-execdash-bar,.hfc-execdash-classfill,.hfc-review-fill,.hfc-countfill,.hfc-kpi-fill{background:linear-gradient(90deg,#0b8d58,#70c49a)}
+.hfc-execdash-classfill{background:linear-gradient(0deg,#0b8d58,#70c49a)}
+.hfc-execdash-target{background:#395b48}
+.hfc-donut{background:conic-gradient(#0d965d 0 var(--hfc-share),#dcece3 var(--hfc-share) 100%)}
+.hfc-review-donut{background:conic-gradient(#0d965d 0 var(--hfc-ok),#c8a567 var(--hfc-ok) var(--hfc-checked),#e6eee9 var(--hfc-checked) 100%)}
+
+/* Dimensional graph finish retained */
+.hfc-execdash-track,.hfc-review-track,.hfc-counttrack,.hfc-kpi-track{
+ box-shadow:inset 0 2px 4px #234b3510,inset 0 -1px 0 #ffffff
+}
+.hfc-execdash-bar,.hfc-execdash-classfill,.hfc-review-fill,.hfc-countfill,.hfc-kpi-fill{
+ background-image:linear-gradient(180deg,#ffffff42 0%,#ffffff0a 38%,#123d291a 100%),linear-gradient(90deg,#0b8d58,#70c49a);
+ box-shadow:inset 0 1px 0 #ffffff8c,inset 0 -2px 3px #164c3026,0 2px 4px #174d3120;
+ border:1px solid #ffffff40
+}
+.hfc-execdash-classfill{background-image:linear-gradient(90deg,#ffffff42 0%,#ffffff0a 42%,#123d291a 100%),linear-gradient(180deg,#70c49a,#0b8d58)}
+.hfc-execdash-target{box-shadow:0 0 0 2px #ffffffad,0 1px 4px #1e382d30}
 .hfc-donut,.hfc-review-donut{filter:drop-shadow(0 7px 9px #17492e20)}
 .hfc-donut-core,.hfc-review-donut-inner{box-shadow:inset 0 2px 6px #1b4b3010,0 2px 6px #1b4b300b}
 .hfc-chart-viz{border-radius:14px}
@@ -1299,35 +1321,6 @@ body[data-view] :is(.main,.modal) .btn-ghost{background:transparent;border-color
 .hfc-chart-viz svg path[stroke]{filter:drop-shadow(0 2px 2px #19644124)}
 .ring svg circle:not(:first-child){filter:drop-shadow(0 2px 2px #17492e25)}
 .hfc-chart-legend i,.legend i{box-shadow:0 1px 3px #17492e24}
-
-/* Soft green sign-in surface */
-.login-screen{
- background:radial-gradient(ellipse at 12% 12%,#d9efe2aa,transparent 48%),radial-gradient(ellipse at 88% 88%,#e1f1e7aa,transparent 42%),linear-gradient(135deg,#f4f9f5,#edf6f0);
- color:#20382d
-}
-.login-screen:before{background-image:linear-gradient(#6b9c7d0a 1px,transparent 1px),linear-gradient(90deg,#6b9c7d0a 1px,transparent 1px)}
-.login-screen:after{border-color:#38895e2a;box-shadow:0 0 0 70px #38895e06,0 0 0 140px #38895e04}
-.login-identity{color:#387756}.login-identity .icon{color:#27885d}
-.login-visual h2{color:#20382d}
-.login-visual h2 span{background-image:linear-gradient(95deg,#167a53,#6ca77f);filter:none}
-.login-intro{color:#60776a}
-.login-hud{background:linear-gradient(140deg,#ffffffd9,#f1f7f3e8);border-color:#cfdfd4;box-shadow:inset 0 1px 0 #ffffff,0 12px 32px #244b3910}
-.login-hud:before{background-image:linear-gradient(#66957a10 1px,transparent 1px),linear-gradient(90deg,#66957a10 1px,transparent 1px)}
-.login-orbit-label{background:#f5faf6ee;border-color:#c8ddd0;color:#3c7054}
-.login-orbit-label.second{color:#497d60;border-color:#c8ddd0}
-.login-hud .hud-corner{border-color:#3c9a68;opacity:.72;filter:none}
-.login-features{color:#60776a}.login-features .icon{color:#318e60}
-.login-card{background:linear-gradient(155deg,#ffffff,#f7fbf8);border:1px solid #d5e5da;box-shadow:0 16px 40px #244b3914,inset 0 1px 0 #ffffff}
-.login-card:before{background:linear-gradient(90deg,transparent,#68ae83,transparent);box-shadow:0 0 8px #68ae8340}
-.login-card .brand-title,.login-card h1{color:#294b38}
-.login-card .brand-sub,.login-card>p{color:#667b6e}
-.login-card label{color:#466a54}
-.login-card input{background:#fff;color:#294b38;border-color:#d7e5db}
-.login-card input:focus{border-color:#55a77a;box-shadow:0 0 0 3px #55a77a20}
-.login-footer{border-color:#dce9e1;color:#687d70}
-.login-footer-title{color:#315a42;text-shadow:none}
-.login-card .reconnect-backend{color:#287c52}
-.login-card .reconnect-backend:hover{background:#e9f4ed}
 </style>
 </head>
 <body>
