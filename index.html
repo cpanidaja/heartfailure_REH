@@ -1267,40 +1267,38 @@ body[data-view="dashboard"] .legend i[style]{background:#84a9ac!important}
  body[data-view="dashboard"] .hfc-execdash-track,body[data-view="dashboard"] .hfc-execdash-classcol {print-color-adjust:exact;-webkit-print-color-adjust:exact}
 }
 
-/* Roiet HF Clinic · minimal emerald theme */
+/* Roiet HF Clinic · calm green + dimensional charts */
 :root{
- --bg:#f5faf7;--surface:#fff;--ink:#1e382b;--muted:#64786d;--line:#d8e9df;
- --teal:#087d50;--teal-light:#e9f6ee;--navy:#173b2d;--orange:#b48a4f;--red:#c25c63;
- --shadow:0 5px 20px #174c3210;--radius:18px
+ --bg:#f3f8f5;--surface:#fff;--ink:#20382d;--muted:#63776c;--line:#dce9e1;
+ --teal:#167a53;--teal-light:#e8f4ed;--navy:#244b39;--orange:#a8793f;--red:#b95b61;
+ --shadow:0 8px 24px #173e2b0d;--radius:18px
 }
-.btn{
- background:#fff;border:1px solid #c7dfd2;color:#365d49;border-radius:12px;
- box-shadow:0 2px 6px #1c603c08;transition:background .18s,border-color .18s,box-shadow .18s,transform .18s
-}
-.btn:hover{background:#f2faf5;border-color:#9ecdb2;color:#245a3d;box-shadow:0 5px 14px #17855016;transform:translateY(-1px)}
-.btn-primary{
- background:linear-gradient(135deg,#12ad70 0%,#078953 100%);border-color:#0a955a;color:#fff;
- box-shadow:0 6px 16px #0789532a,inset 0 1px 0 #ffffff55
-}
-.btn-primary:hover{
- background:linear-gradient(135deg,#18b978 0%,#087c4e 100%);border-color:#078953;color:#fff;
- box-shadow:0 8px 20px #07895336
-}
-.btn-ghost{background:transparent;border-color:transparent;color:#4d725e;box-shadow:none}
-button:focus-visible,a:focus-visible{outline:3px solid #43ad78;outline-offset:3px}
-body[data-view] :is(.main,.modal) .btn{background:#fff;border-color:#c7dfd2;color:#365d49;box-shadow:0 2px 6px #1c603c08}
-body[data-view] :is(.main,.modal) .btn:hover{background:#f2faf5;border-color:#9ecdb2;color:#245a3d;box-shadow:0 5px 14px #17855016}
-body[data-view] :is(.main,.modal) .btn-primary{background:linear-gradient(135deg,#12ad70 0%,#078953 100%);border-color:#0a955a;color:#fff;box-shadow:0 6px 16px #0789532a,inset 0 1px 0 #ffffff55}
-body[data-view] :is(.main,.modal) .btn-primary:hover{background:linear-gradient(135deg,#18b978 0%,#087c4e 100%);border-color:#078953;color:#fff;box-shadow:0 8px 20px #07895336}
-body[data-view] :is(.main,.modal) .btn-ghost{background:transparent;border-color:transparent;color:#4d725e;box-shadow:none}
-.chart text{fill:#718479}
-.chart .axis{stroke:#e2eee7}
-.hfc-execdash-track,.hfc-review-track,.hfc-counttrack,.hfc-kpi-track{background:#edf5f0}
-.hfc-execdash-bar,.hfc-execdash-classfill,.hfc-review-fill,.hfc-countfill,.hfc-kpi-fill{background:linear-gradient(90deg,#0b8d58,#70c49a)}
-.hfc-execdash-classfill{background:linear-gradient(0deg,#0b8d58,#70c49a)}
-.hfc-execdash-target{background:#395b48}
-.hfc-donut{background:conic-gradient(#0d965d 0 var(--hfc-share),#dcece3 var(--hfc-share) 100%)}
-.hfc-review-donut{background:conic-gradient(#0d965d 0 var(--hfc-ok),#c8a567 var(--hfc-ok) var(--hfc-checked),#e6eee9 var(--hfc-checked) 100%)}
+body{background:var(--bg);color:var(--ink)}
+.btn{background:#fff;border:1px solid #c9ddd0;color:#345d47;border-radius:12px;box-shadow:0 2px 6px #173e2b0a;transition:background .18s,border-color .18s,box-shadow .18s,transform .18s}
+.btn:hover{background:#f1f8f3;border-color:#a8cbb5;color:#244f39;box-shadow:0 5px 14px #1b694012;transform:translateY(-1px)}
+.btn-primary{background:linear-gradient(135deg,#39ad7a 0%,#168257 100%);border-color:#258c60;color:#fff;box-shadow:0 5px 12px #176b4620,inset 0 1px 0 #ffffff66}
+.btn-primary:hover{background:linear-gradient(135deg,#43b985 0%,#16764f 100%);border-color:#1d8358;color:#fff;box-shadow:0 7px 16px #176b4626}
+.btn-ghost{background:transparent;border-color:transparent;color:#4e705b;box-shadow:none}
+button:focus-visible,a:focus-visible{outline:3px solid #54a77a;outline-offset:3px}
+body[data-view] :is(.main,.modal) .btn{background:#fff;border-color:#c9ddd0;color:#345d47;box-shadow:0 2px 6px #173e2b0a}
+body[data-view] :is(.main,.modal) .btn:hover{background:#f1f8f3;border-color:#a8cbb5;color:#244f39;box-shadow:0 5px 14px #1b694012}
+body[data-view] :is(.main,.modal) .btn-primary{background:linear-gradient(135deg,#39ad7a 0%,#168257 100%);border-color:#258c60;color:#fff;box-shadow:0 5px 12px #176b4620,inset 0 1px 0 #ffffff66}
+body[data-view] :is(.main,.modal) .btn-primary:hover{background:linear-gradient(135deg,#43b985 0%,#16764f 100%);border-color:#1d8358;color:#fff;box-shadow:0 7px 16px #176b4626}
+body[data-view] :is(.main,.modal) .btn-ghost{background:transparent;border-color:transparent;color:#4e705b;box-shadow:none}
+.chart text{fill:#64796c}.chart .axis{stroke:#e0ebe4}
+.panel,.stat,.toolbar{box-shadow:0 8px 24px #173e2b0d}
+.hfc-execdash-track,.hfc-review-track,.hfc-counttrack,.hfc-kpi-track{background:linear-gradient(180deg,#e5eee8,#f0f6f2);box-shadow:inset 0 2px 4px #234b3510,inset 0 -1px 0 #ffffff}
+.hfc-execdash-bar,.hfc-execdash-classfill,.hfc-review-fill,.hfc-countfill,.hfc-kpi-fill{background-image:linear-gradient(180deg,#ffffff42 0%,#ffffff0a 38%,#123d291a 100%),linear-gradient(90deg,#238d61,#59b889);box-shadow:inset 0 1px 0 #ffffff8c,inset 0 -2px 3px #164c3026,0 2px 4px #174d3120;border:1px solid #ffffff40}
+.hfc-execdash-classfill{background-image:linear-gradient(90deg,#ffffff42 0%,#ffffff0a 42%,#123d291a 100%),linear-gradient(180deg,#5dbb8b,#20865a)}
+.hfc-execdash-target{background:#42604e;box-shadow:0 0 0 2px #ffffffad,0 1px 4px #1e382d30}
+.hfc-donut,.hfc-review-donut{filter:drop-shadow(0 7px 9px #17492e20)}
+.hfc-donut-core,.hfc-review-donut-inner{box-shadow:inset 0 2px 6px #1b4b3010,0 2px 6px #1b4b300b}
+.hfc-chart-viz{border-radius:14px}
+.hfc-chart-viz svg rect{filter:drop-shadow(0 3px 2px #17492e22);stroke:#ffffff78;stroke-width:.8}
+.hfc-chart-viz svg polygon{filter:drop-shadow(0 2px 2px #17492e1c)}
+.hfc-chart-viz svg path[stroke]{filter:drop-shadow(0 2px 2px #19644124)}
+.ring svg circle:not(:first-child){filter:drop-shadow(0 2px 2px #17492e25)}
+.hfc-chart-legend i,.legend i{box-shadow:0 1px 3px #17492e24}
 </style>
 </head>
 <body>
@@ -1478,9 +1476,9 @@ function hfcEligibleChart(data){
  const rows=(Array.isArray(data)?data:[]).filter(r=>r&&r.total!==null&&r.total!==undefined&&hfcNum(r.total)>0).slice(0,7);
  if(!rows.length)return hfcEmpty('ยังไม่มีตัวหาร GDMT ที่ประเมินแล้วในช่วงนี้');
  const W=620,H=248,L=41,R=12,T=28,B=69,plotW=W-L-R,plotH=H-T-B,step=plotW/rows.length,barW=Math.min(53,step*.52);
- let svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="กราฟแท่งเปรียบเทียบร้อยละการได้รับ GDMT แยกกลุ่มยา">';
+ let svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="กราฟแท่งเปรียบเทียบร้อยละการได้รับ GDMT แยกกลุ่มยา"><defs><linearGradient id="hfcBar0" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#65bd91"/><stop offset="100%" stop-color="#218257"/></linearGradient><linearGradient id="hfcBar1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7ac69e"/><stop offset="100%" stop-color="#328c62"/></linearGradient><linearGradient id="hfcBar2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#91cfad"/><stop offset="100%" stop-color="#3d986c"/></linearGradient><linearGradient id="hfcBar3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a7d8bb"/><stop offset="100%" stop-color="#4aa377"/></linearGradient></defs>';
  for(const tick of [0,25,50,75,100]){const y=T+plotH-tick/100*plotH;svg+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="#e2eee7" stroke-dasharray="4 4"/><text x="'+(L-7)+'" y="'+(y+4)+'" text-anchor="end">'+tick+'%</text>';}
- rows.forEach((r,i)=>{const raw=r.percent===null||r.percent===undefined?100*hfcNum(r.count)/hfcNum(r.total):Number(r.percent),p=Number.isFinite(raw)?Math.max(0,Math.min(100,raw)):0,x=L+(i+.5)*step,y=T+plotH-p*plotH,h=Math.max(2,p*plotH/100),label=String(r.label||'กลุ่มยา'),short=label.length>14?label.slice(0,13)+'…':label;svg+='<rect x="'+(x-barW/2)+'" y="'+(T+plotH-h)+'" width="'+barW+'" height="'+h+'" rx="5" fill="'+['#087f5b','#0d9560','#25a873','#55ba8b'][i%4]+'"><title>'+esc(label)+': '+esc(percent(p))+' ('+esc(fmt(r.count))+' / '+esc(fmt(r.total))+')</title></rect><text x="'+x+'" y="'+Math.max(15,T+plotH-h-7)+'" text-anchor="middle" font-weight="700" fill="#24684d">'+esc(percent(p))+'</text><text x="'+x+'" y="'+(H-B+18)+'" text-anchor="middle">'+esc(short)+'</text><text x="'+x+'" y="'+(H-B+35)+'" text-anchor="middle">'+esc(fmt(r.count))+'/'+esc(fmt(r.total))+'</text>';});
+ rows.forEach((r,i)=>{const raw=r.percent===null||r.percent===undefined?100*hfcNum(r.count)/hfcNum(r.total):Number(r.percent),p=Number.isFinite(raw)?Math.max(0,Math.min(100,raw)):0,x=L+(i+.5)*step,y=T+plotH-p*plotH,h=Math.max(2,p*plotH/100),label=String(r.label||'กลุ่มยา'),short=label.length>14?label.slice(0,13)+'…':label,frontX=x-barW/2,top=T+plotH-h,base=T+plotH,depth=Math.min(8,barW*.16),palette=['#218257','#328c62','#3d986c','#4aa377'],shade=['#155d3e','#216644','#2b704f','#357a59'],k=i%4;svg+='<g role="img" aria-label="'+esc(label)+' '+esc(percent(p))+'"><title>'+esc(label)+': '+esc(percent(p))+' ('+esc(fmt(r.count))+' / '+esc(fmt(r.total))+')</title><polygon points="'+(frontX+barW)+','+top+' '+(frontX+barW+depth)+','+(top-depth)+' '+(frontX+barW+depth)+','+(base-depth)+' '+(frontX+barW)+','+base+'" fill="'+shade[k]+'"/><polygon points="'+frontX+','+top+' '+(frontX+barW)+','+top+' '+(frontX+barW+depth)+','+(top-depth)+' '+(frontX+depth)+','+(top-depth)+'" fill="#a8d9bc"/><rect x="'+frontX+'" y="'+top+'" width="'+barW+'" height="'+h+'" rx="4" fill="url(#hfcBar'+k+')" stroke="'+palette[k]+'" stroke-width=".7"/></g><text x="'+x+'" y="'+Math.max(15,top-depth-8)+'" text-anchor="middle" font-weight="700" fill="#315e47">'+esc(percent(p))+'</text><text x="'+x+'" y="'+(H-B+18)+'" text-anchor="middle">'+esc(short)+'</text><text x="'+x+'" y="'+(H-B+35)+'" text-anchor="middle">'+esc(fmt(r.count))+'/'+esc(fmt(r.total))+'</text>';});
  return '<div class="hfc-chart-viz">'+svg+'</svg></div><p class="hfc-chart-note">แต่ละกลุ่มยา: จำนวนได้รับ ÷ จำนวน eligible (ใช่ + ไม่ใช่) • ตัด “ข้อจำกัด” ออกจากตัวหาร • ไม่ใช่ MTD</p>';
 }
 function hfcVisitMix(d){
