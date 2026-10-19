@@ -1473,7 +1473,7 @@ async function reconnectBackend(){
 // moving between pages does not wait on Apps Script again. Any write clears the cache.
 // Identical reads already in flight are shared, so a prefetch started at login is reused by the page that needs it.
 const API_CACHE=new Map(),API_INFLIGHT=new Map(),API_CACHE_MS=60000,API_DASHBOARD_CACHE_MS=300000,CACHED_READS=new Set(['getDashboard','listRecords','getReport','getFmtPatientCoverage']),API_WRITES=/^(save|sync|logout|changePassword)/;
-function clearApiCache(){API_CACHE.clear();API_INFLIGHT.clear();HFC_REVIEW_RENDER_CACHE.clear();}
+function clearApiCache(){API_CACHE.clear();API_INFLIGHT.clear();}
 async function api(method,...args){
  const key=CACHED_READS.has(method)?method+'|'+sessionToken+'|'+JSON.stringify(args):'';
  const hit=key&&API_CACHE.get(key);if(hit&&Date.now()-hit.at<(method==='getDashboard'?API_DASHBOARD_CACHE_MS:API_CACHE_MS))return structuredClone(hit.value);
