@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ไม่พบหน้า · HF Clinic</title>
+<script>
+  const path = location.pathname.replace(/\/+$/, "");
+  if (path === "/heartfailure_REH/Codex") {
+    const target = new URL("/heartfailure_REH/", location.origin);
+    target.search = location.search;
+    target.hash = location.hash;
+    location.replace(target.href);
+  }
+</script>
+</head>
+<body>
+<h1>ไม่พบหน้านี้ (404)</h1>
+<p>ไม่พบหน้าที่ต้องการ กรุณาตรวจสอบ URL</p>
+<p><a href="/heartfailure_REH/">เปิด HF Clinic</a></p>
+</body>
+</html>
