@@ -30,6 +30,8 @@ function hfReadExecutiveDashboardSummary_() {
   const eligibilityRow = dashboard.getRange('B31:D31').getValues()[0];
   const stamp = sheet.getRange('A3').getDisplayValue();
   const timeZone = book.getSpreadsheetTimeZone() || 'Asia/Bangkok';
+  const futureCell = metrics.getRange('E4').getValue();
+  const futureDatedRows = typeof futureCell === 'number' && isFinite(futureCell) && futureCell >= 0 ? Math.floor(futureCell) : null;
 
   function numeric(v, description) {
     if (typeof v !== 'number' || !isFinite(v)) {
@@ -76,11 +78,12 @@ function hfReadExecutiveDashboardSummary_() {
     const received = count(r[2], 'C'+row);
     const assessed = count(r[3], 'D'+row);
     const percentage = percentFraction(r[1], 'B'+row);
-    if (assessed === 0 || received > assessed ||
-        Math.abs(percentage - 100*received/assessed) > 0.011) {
+    if (received > assessed || (assessed === 0
+        ? (received !== 0 || percentage !== 0)
+        : Math.abs(percentage - 100*received/assessed) > 0.011)) {
       throw new Error('EXEC_DASHBOARD_GDMT_MISMATCH: ตรวจสอบแถว '+row);
     }
-    return {label:text(r[0]),percent:percentage,
+    return {label:text(r[0]),percent:assessed ? percentage : null,
       received:received,assessed:assessed,sourceRow:row};
   });
 
@@ -92,8 +95,11 @@ function hfReadExecutiveDashboardSummary_() {
       : percentFraction(r[1], 'B'+row);
     const target = (typeof r[2] === 'number' && isFinite(r[2]))
       ? percentFraction(r[2], 'C'+row) : null;
-    return {label:text(r[0]),actual:rate,target:target,
-      description:text(r[4]),status:text(r[3]),
+    const description = text(r[4]);
+    const noDenominator = !isCount && (/(^|[^0-9])0\s*\/\s*0([^0-9]|$)/.test(description) ||
+      (row === 20 && /ประเมินแล้ว\s*0\s*ครั้ง/.test(description)) || (row === 21 && eligibilityDenominator === 0));
+    return {label:text(r[0]),actual:noDenominator ? null : rate,target:target,
+      description:description,status:noDenominator ? 'ไม่มีตัวหาร' : text(r[3]),
       sourceRow:row,unit:isCount?'count':'percent',
       lowerIsBetter:row===18};
   });
@@ -125,6 +131,7 @@ function hfReadExecutiveDashboardSummary_() {
       mtdPct:mtdRate,
       mtdCountDifference:denominator-count(reg[0],'A6')
     },
+    dataQuality:{futureDatedRows:futureDatedRows},
     eligibility:{
       numerator:eligibilityNumerator,
       denominator:eligibilityDenominator,

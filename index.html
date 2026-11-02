@@ -1656,8 +1656,8 @@ function hfcGdmtAppropriatenessChart(summary){
 /* Verified aggregate-only values sourced from Executive_Dashboard.
    IMPORTANT: these are NOT the filtered getDashboard calculations; never
    overwrite this section from getDashboard. No HN, patient names or CID. */
-const HF_WEB_BUILD='2026.10.18.1';
-const HFC_EXECUTIVE_SNAPSHOT={"schemaVersion":2,"source":"Executive_Dashboard","mode":"published","verifiedFrom":"Google Sheets aggregate cells","checkedAt":"2026-10-17","asOf":"ข้อมูลสรุปจาก Google Sheets ณ 17/10/2026 • ช่วงวันที่ของ KPI อื่นอ้างอิงตามชีตต้นฉบับ","note":"ไฟล์ JSON นี้เป็นข้อมูลสำรอง ณ วันที่ตรวจ ไม่ใช่การเชื่อมต่อสด; อัตรา FMT eligibility คิดจากทุกแถวมี HN และมีค่า AV โดยนับ HN ซ้ำทั้งเศษและส่วน","registry":{"registeredShown":273,"octoberVisits":75,"octoberUnique":70,"mtdNumerator":268,"mtdDenominator":273,"mtdPct":98.16849816849816,"mtdCountDifference":0},"eligibility":{"numerator":258,"denominator":272,"pct":94.85294117647058,"pending":14,"missing":1,"unit":"visits","sourceColumn":"HF_Patient_Data!AV6:AV1098","basis":"All rows with nonblank HN and FMT eligibility value; duplicate HN counted"},"kpis":[{"label":"ความครบถ้วนของ FMT / GDMT","actual":79.3103448275862,"target":60,"description":"46/58 • ครั้งบริการ HFrEF ที่เข้าเกณฑ์ประเมิน (eligible-adjusted)","status":"ผ่านเกณฑ์","sourceRow":14,"unit":"percent","lowerIsBetter":false},{"label":"ร้อยละรายการรับบริการที่บันทึกถึง MTD (นับ HN ซ้ำ)","actual":98.16849816849816,"target":60,"description":"ตัวเศษ 268 ครั้งที่ตอบ MTD=ใช่ / ตัวหาร 273 ครั้งที่มี HN • รวม HN ซ้ำทั้งคู่ (*ต้องยืนยันเกณฑ์เป้าหมายรายครั้ง)","status":"ถึงเกณฑ์เชิงตัวเลข*","sourceRow":15,"unit":"percent","lowerIsBetter":false},{"label":"ความร่วมมือในการใช้ยา","actual":97.33333333333333,"target":80,"description":"73/75 • ครั้งบริการที่มีผลการประเมิน adherence","status":"ผ่านเกณฑ์","sourceRow":16,"unit":"percent","lowerIsBetter":false},{"label":"การแก้ไข DRP สำเร็จ • คิดต่อเหตุการณ์จาก DRP_Log","actual":100,"target":80,"description":"แก้ไขสำเร็จ 7 / 7 เหตุการณ์ DRP • 01/10–17/10/2026","status":"ผ่านเกณฑ์","sourceRow":17,"unit":"percent","lowerIsBetter":false},{"label":"อัตรา ADR ที่สามารถป้องกันได้","actual":0,"target":5,"description":"0/75 • เหตุการณ์ preventable ADR ÷ ครั้งรับบริการ; ค่ายิ่งต่ำยิ่งดี","status":"ผ่านเกณฑ์ <5%","sourceRow":18,"unit":"percent","lowerIsBetter":true},{"label":"จำนวน DRP ที่พบ • นับเหตุการณ์ใน DRP_Log","actual":7,"target":null,"description":"บันทึก 7 เหตุการณ์ • ผู้ป่วย HN ไม่ซ้ำ 7 ราย • แก้ไขสำเร็จ 7 เหตุการณ์","status":"ข้อมูลจาก DRP_Log","sourceRow":19,"unit":"count","lowerIsBetter":false},{"label":"ความเหมาะสมตาม GDMT • เฉพาะครั้งที่ประเมิน","actual":100,"target":null,"description":"เหมาะสม 75 / ไม่เหมาะสม 0 • ประเมินแล้ว 75 ครั้ง • ยังไม่กำหนดเกณฑ์เป้าหมาย","status":"สรุปผล","sourceRow":20,"unit":"percent","lowerIsBetter":false},{"label":"FMT eligibility • เฉพาะครั้งที่มีผล (นับ HN ซ้ำ)","actual":94.85294117647058,"target":null,"description":"Eligible 258 / มีผลประเมิน 272 ครั้ง • ทุก HN รวม HN ซ้ำทั้งตัวเศษและตัวหาร • สถานะต้องประเมินเพิ่มรวมในตัวหาร","status":"สรุป eligibility","sourceRow":21,"unit":"percent","lowerIsBetter":false}],"gdmt":[{"label":"ACEi / ARB / ARNI","percent":85,"received":34,"assessed":40,"sourceRow":34},{"label":"β-blocker","percent":100,"received":52,"assessed":52,"sourceRow":35},{"label":"MRA","percent":76,"received":19,"assessed":25,"sourceRow":36},{"label":"SGLT2i","percent":75,"received":3,"assessed":4,"sourceRow":37}],"sourceCoordinates":{"registry":"Executive_Dashboard!A6:M6","kpis":"Executive_Dashboard!A14:E21","gdmt":"Executive_Dashboard!A34:D37","mtd":"_Executive_Metrics!B2:B4","eligibility":"Dashboard!B31:D31"},"definitionVersion":"HF-ALL-ROWS-20261017"};
+const HF_WEB_BUILD='2026.11.02.1';
+const HFC_EXECUTIVE_SNAPSHOT={"schemaVersion":2,"source":"Executive_Dashboard","mode":"published","verifiedFrom":"Google Sheets aggregate cells","checkedAt":"2026-11-02","asOf":"ข้อมูลสำรองจาก Google Sheets ณ 02/11/2026 • KPI และ DRP ณ 02/11/2026 • ไม่ใช่ข้อมูลสด","note":"ข้อมูลรวมสำรองเท่านั้น ไม่ใช่ข้อมูลสด • MTD และ FMT eligibility นับ HN ซ้ำ • มีวันที่บริการในอนาคต 39 ระเบียนรอตรวจสอบ","registry":{"registeredShown":354,"octoberVisits":8,"octoberUnique":8,"mtdNumerator":349,"mtdDenominator":354,"mtdPct":98.58757062146893,"mtdCountDifference":0},"eligibility":{"numerator":354,"denominator":354,"pct":100,"pending":0,"missing":0,"unit":"visits","sourceColumn":"HF_Patient_Data!AV6:AV1098","basis":"All rows with nonblank HN and FMT eligibility value; duplicate HN counted"},"kpis":[{"label":"ความครบถ้วนของ FMT / GDMT","actual":100,"target":60,"description":"6/6 • ครั้งบริการ HFrEF ที่เข้าเกณฑ์ประเมิน (eligible-adjusted)","status":"ผ่านเกณฑ์","sourceRow":14,"unit":"percent","lowerIsBetter":false},{"label":"ร้อยละรายการรับบริการที่บันทึกถึง MTD (นับ HN ซ้ำ)","actual":98.58757062146893,"target":60,"description":"ตัวเศษ 349 ครั้งที่ตอบ MTD=ใช่ / ตัวหาร 354 ครั้งที่มี HN • รวม HN ซ้ำทั้งคู่ (*ต้องยืนยันเกณฑ์เป้าหมายรายครั้ง)","status":"ถึงเกณฑ์เชิงตัวเลข*","sourceRow":15,"unit":"percent","lowerIsBetter":false},{"label":"ความร่วมมือในการใช้ยา","actual":100,"target":80,"description":"8/8 • ครั้งบริการที่มีผลการประเมิน adherence","status":"ผ่านเกณฑ์","sourceRow":16,"unit":"percent","lowerIsBetter":false},{"label":"การแก้ไข DRP สำเร็จ • คิดต่อเหตุการณ์จาก DRP_Log","actual":null,"target":80,"description":"แก้ไขสำเร็จ 0 / 0 เหตุการณ์ DRP • 01/11–02/11/2026","status":"ไม่มีตัวหาร","sourceRow":17,"unit":"percent","lowerIsBetter":false},{"label":"อัตรา ADR ที่สามารถป้องกันได้","actual":0,"target":5,"description":"0/8 • เหตุการณ์ preventable ADR ÷ ครั้งรับบริการ; ค่ายิ่งต่ำยิ่งดี","status":"ผ่านเกณฑ์ <5%","sourceRow":18,"unit":"percent","lowerIsBetter":true},{"label":"จำนวน DRP ที่พบ • นับเหตุการณ์ใน DRP_Log","actual":0,"target":null,"description":"บันทึก 0 เหตุการณ์ • ผู้ป่วย HN ไม่ซ้ำ 1 ราย • แก้ไขสำเร็จ 0 เหตุการณ์","status":"ข้อมูลจาก DRP_Log","sourceRow":19,"unit":"count","lowerIsBetter":false},{"label":"ความเหมาะสมตาม GDMT • เฉพาะครั้งที่ประเมิน","actual":100,"target":60,"description":"เหมาะสม 8 / ไม่เหมาะสม 0 • ประเมินแล้ว 8 ครั้ง • ตัวหาร = เฉพาะครั้งที่มีผล (เหมาะสม + ไม่เหมาะสม)","status":"ผ่านเกณฑ์","sourceRow":20,"unit":"percent","lowerIsBetter":false},{"label":"FMT eligibility • เฉพาะครั้งที่มีผล (นับ HN ซ้ำ)","actual":100,"target":60,"description":"Eligible 354 / มีผลประเมิน 354 ครั้ง • ทุก HN รวม HN ซ้ำทั้งตัวเศษและตัวหาร • สถานะต้องประเมินเพิ่มรวมในตัวหาร","status":"ผ่านเกณฑ์","sourceRow":21,"unit":"percent","lowerIsBetter":false}],"gdmt":[{"label":"ACEi / ARB / ARNI","percent":100,"received":5,"assessed":5,"sourceRow":34},{"label":"β-blocker","percent":100,"received":6,"assessed":6,"sourceRow":35},{"label":"MRA","percent":100,"received":5,"assessed":5,"sourceRow":36},{"label":"SGLT2i","percent":null,"received":0,"assessed":0,"sourceRow":37}],"sourceCoordinates":{"registry":"Executive_Dashboard!A6:M6","kpis":"Executive_Dashboard!A14:E21","gdmt":"Executive_Dashboard!A34:D37","mtd":"_Executive_Metrics!B2:B4","eligibility":"Dashboard!B31:D31"},"definitionVersion":"HF-ALL-ROWS-20261017","dataQuality":{"futureDatedRows":39}};
 let HFC_EXECUTIVE_FEED=HFC_EXECUTIVE_SNAPSHOT,HFC_EXEC_FEED_LOADED=false,HFC_EXEC_FEED_LOADING=false,HFC_EXEC_FEED_CHECKED=null,HFC_EXEC_FEED_SOURCE='snapshot',HFC_EXEC_FEED_ERROR='';
 function hfcExecKpis(){return (HFC_EXECUTIVE_FEED.kpis||[]).map(r=>({...r}));}
 function hfcExecGdmt(){return (HFC_EXECUTIVE_FEED.gdmt||[]).map(r=>({...r}));}
@@ -1672,8 +1672,8 @@ function hfcExecStats(){
  const m=Number(r.mtdNumerator||0),b=Number(r.mtdDenominator||0),y=Number(e.numerator||0),n=Number(e.denominator||0),coverage=(HFC_EXECUTIVE_FEED.kpis||[]).find(k=>k.sourceRow===14),coveragePct=coverage&&Number.isFinite(Number(coverage.actual))?percent(Number(coverage.actual)):'—',eligibilityKpi=(HFC_EXECUTIVE_FEED.kpis||[]).find(k=>k.sourceRow===21),eligibilityTarget=Number(eligibilityKpi?.target);
  const blocks=[
  ['ระเบียนสะสมในทะเบียน',fmt(r.registeredShown),'นับทุกแถวที่มี HN รวม HN ซ้ำ'],
- ['ครั้งรับบริการ ต.ค.',fmt(r.octoberVisits),'ช่วงวันที่ตาม Dashboard'],
- ['HN ไม่ซ้ำ ต.ค.',fmt(r.octoberUnique),'เฉพาะช่วงวันที่ตาม Dashboard'],
+ ['ครั้งรับบริการตามชีต',fmt(r.octoberVisits),'ช่วงอ้างอิงตาม Executive_Dashboard'],
+ ['HN ไม่ซ้ำตามชีต',fmt(r.octoberUnique),'ช่วงอ้างอิงตาม Executive_Dashboard'],
  ['ความครบถ้วน FMT/GDMT ทั้งทะเบียน',coveragePct,coverage?.description||'Executive_Dashboard แถว 14'],
  ['MTD รายครั้ง ทั้งทะเบียน',b?percent(100*m/b):'—',fmt(m)+' / '+fmt(b)+' ครั้ง • HN ซ้ำนับ'],
  ['FMT eligibility ทั้งทะเบียน',n?percent(100*y/n):'—',fmt(y)+' / '+fmt(n)+' ครั้งที่มีผล • HN ซ้ำนับ'+(Number.isFinite(eligibilityTarget)?' • เป้าหมาย ≥ '+percent(eligibilityTarget)+' • '+(n&&100*y/n>=eligibilityTarget?'ผ่านเป้าหมาย':'ต่ำกว่าเป้าหมาย'):'')]
@@ -1704,8 +1704,8 @@ function hfcExecutiveKpiChart(){
   const goal=Number.isFinite(Number(r.target))&&r.target!==null&&r.target!==undefined?Number(r.target):null;
   const target=goal===null?null:Math.max(0,Math.min(100,goal));
   const good=valid&&goal!==null&&(r.lowerIsBetter?value<goal:value>=goal);
-  const grade=goal===null?esc(r.status||'ไม่มีเกณฑ์เป้าหมาย'):(!valid?'ไม่มีข้อมูล':good?'ผ่านเป้าหมาย':'ยังไม่ผ่านเป้าหมาย');
-  const gradeClass=goal!==null&&!good?' is-warning':'';
+  const grade=goal===null?esc(r.status||'ไม่มีเกณฑ์เป้าหมาย'):(!valid?'ไม่มีตัวหาร':good?'ผ่านเป้าหมาย':'ยังไม่ผ่านเป้าหมาย');
+  const gradeClass=goal!==null&&valid&&!good?' is-warning':'';
   return '<div class="hfc-execdash-row"><div class="hfc-execdash-rownames"><strong>'+esc(r.label)+'</strong><span>'+(!valid?'—':isCount?esc(fmt(value))+' เหตุการณ์':esc(percent(value)))+(goal===null?' · ไม่มีเป้าหมาย': ' / เป้า '+(r.lowerIsBetter?'&lt;':'≥')+esc(percent(target)))+'</span></div>'
    +(goal===null&&isCount?'<div class="hfc-exec-count-divider"></div>':'<div class="hfc-execdash-track"><div class="hfc-execdash-bar" style="width:'+actual.toFixed(2)+'%"></div>'+(target===null?'':'<i class="hfc-execdash-target" style="left:'+target.toFixed(2)+'%" aria-hidden="true"></i>')+'</div>')
    +'<div class="hfc-execdash-detail">'+esc(r.description)+' <span class="hfc-execdash-status'+gradeClass+'">'+grade+'</span><span class="hfc-execdash-freshness">'+hfcExecVerifiedLabel(r)+'</span></div></div>';
@@ -1715,8 +1715,8 @@ function hfcExecutiveKpiChart(){
 function hfcExecutiveGdmtChart(){
  const data=hfcExecGdmt();
  return '<div class="hfc-execdash-classes" role="img" aria-label="GDMT Class Coverage จาก Executive_Dashboard!A34:D37">'+data.map(r=>{
-  const p=Math.max(0,Math.min(100,Number(r.percent)||0));
-  return '<div class="hfc-execdash-class"><strong>'+esc(percent(p))+'</strong><div class="hfc-execdash-classcol"><div class="hfc-execdash-classfill" style="height:'+p.toFixed(2)+'%"></div></div><div class="hfc-execdash-classname">'+esc(r.label)+'</div><small>'+esc(fmt(r.received))+' / '+esc(fmt(r.assessed))+' ครั้ง</small></div>';
+  const p=Number(r.assessed)>0?Math.max(0,Math.min(100,Number(r.percent)||0)):null;
+  return '<div class="hfc-execdash-class"><strong>'+(p===null?'—':esc(percent(p)))+'</strong><div class="hfc-execdash-classcol"><div class="hfc-execdash-classfill" style="height:'+(p===null?'0':p.toFixed(2))+'%"></div></div><div class="hfc-execdash-classname">'+esc(r.label)+'</div><small>'+esc(fmt(r.received))+' / '+esc(fmt(r.assessed))+' ครั้ง'+(p===null?' · ไม่มีตัวหาร':'')+'</small></div>';
  }).join('')+'</div><p class="hfc-execdash-source">ตรงตาม Executive_Dashboard!A34:D37 • ได้รับยา ÷ eligible ในแต่ละกลุ่ม • ตัด “ข้อจำกัด” ออกจากตัวหาร • อ้างอิงวันที่จากชีตต้นฉบับ</p>';
 }
 
@@ -1733,6 +1733,7 @@ function hfcExecutiveDashboardSnapshot(){
   +'<p class="hfc-execdash-alert">'+banner+'</p>'
   +'<p class="hfc-chart-note">Web build '+esc(HF_WEB_BUILD)+' • ตรวจการอัปเดตตัวชี้วัดด้วยวันที่ของแหล่งข้อมูลที่กำกับ</p>'
   +hfcExecStats()
+  +(Number(src.dataQuality?.futureDatedRows)>0?'<p class="hfc-exec-discrepancy">ตรวจสอบคุณภาพข้อมูล: มีระเบียนลงวันที่รับบริการในอนาคต '+esc(fmt(src.dataQuality.futureDatedRows))+' แถวในทะเบียน • ค่า MTD รวมระเบียนเหล่านี้ตามฐานนับต้นฉบับ</p>':'')
   +(Number(r.mtdCountDifference)!==0?'<p class="hfc-exec-discrepancy">ตรวจสอบฐานนับ: จำนวนระเบียน A6 แสดง '+esc(fmt(r.registeredShown))+' ครั้ง แต่ MTD จาก _Executive_Metrics ใช้ '+esc(fmt(r.mtdDenominator))+' ครั้ง (ต่างกัน '+esc(fmt(Math.abs(r.mtdCountDifference)))+') — แสดงตามต้นฉบับโดยยังไม่แก้ตัวเลขใน Google Sheets</p>':'')
   +'<div class="grid">'+panel('ผลการดำเนินงานเทียบเป้าหมาย','KPI ทั้งทะเบียน • อ้างอิง Executive_Dashboard แถว 14–21',hfcExecutiveKpiChart(),'EXECUTIVE KPI')
    +panel('ความครอบคลุม GDMT แยกกลุ่มยา','GDMT Coverage • ตาม Executive_Dashboard!A34:D37',hfcExecutiveGdmtChart(),'GDMT COVERAGE')
@@ -1750,8 +1751,10 @@ function hfcExecutiveFeedValid(v){
  Number(v.registry.mtdDenominator)<=0||Number(v.registry.mtdDenominator)!==Number(v.registry.registeredShown)||
  den>Number(v.registry.mtdDenominator)||yes+Number(x.pending)!==den||den+Number(x.missing)!==Number(v.registry.mtdDenominator))return false;
  if(Math.abs(mtd.actual-100*v.registry.mtdNumerator/v.registry.mtdDenominator)>0.011)return false;
- return v.kpis.every(r=>Number.isFinite(Number(r.actual))&&r.label&&Number.isInteger(r.sourceRow))&&
- v.gdmt.every(r=>r.assessed>0&&r.received>=0&&Math.abs(Number(r.percent)-100*r.received/r.assessed)<0.05);
+ return v.kpis.every(r=>r.label&&Number.isInteger(r.sourceRow)&&
+   (r.actual===null?(r.status==='ไม่มีตัวหาร'||r.status==='รอข้อมูล')&&r.sourceRow!==15&&r.sourceRow!==21:Number.isFinite(Number(r.actual))))&&
+  v.gdmt.every(r=>Number.isInteger(r.assessed)&&Number.isInteger(r.received)&&r.assessed>=0&&r.received>=0&&r.received<=r.assessed&&
+   (r.assessed===0?r.percent===null:Math.abs(Number(r.percent)-100*r.received/r.assessed)<0.05));
 }
 async function hfcExecRefresh(silent=false){
  const btn=document.getElementById('hfcExecRefresh'),status=document.getElementById('hfcExecStatus');
@@ -1765,7 +1768,7 @@ async function hfcExecRefresh(silent=false){
   // aggregated cells each request (no local API cache for this action).
   let json=null,source='live',rpcError=null;
   try{
-   json=await api('getExecutiveDashboardSummary',!silent);
+   json=await Promise.race([api('getExecutiveDashboardSummary',!silent),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Apps Script ไม่ตอบกลับใน 18 วินาที โปรดตรวจ Deployment')),18000))]);
    if(!hfcExecutiveFeedValid(json)||json.mode!=='live')throw new Error('Apps Script ส่งข้อมูล Executive_Dashboard ไม่ครบตามรูปแบบ');
   }catch(e){
    rpcError=e;

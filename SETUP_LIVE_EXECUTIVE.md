@@ -1,6 +1,6 @@
 # HF Clinic Web — เชื่อม Executive Dashboard กับ Google Sheets
 
-อัปเดต: 17 ตุลาคม 2569 | กลุ่มงานเภสัชกรรม โรงพยาบาลร้อยเอ็ด
+อัปเดต: 2 พฤศจิกายน 2569 | กลุ่มงานเภสัชกรรม โรงพยาบาลร้อยเอ็ด
 
 ## สิ่งที่แก้แล้วใน GitHub
 
@@ -59,3 +59,10 @@ FMT eligibility นับจาก `HF_Patient_Data!D6:D1098` (HN) และ `AV
 - ถ้า Executive Dashboard แสดง **ข้อมูลสำรอง** แม้เว็บเป็นเวอร์ชันใหม่: โปรดตรวจ Apps Script `getExecutiveDashboardSummary`, session/auth, และ deployment version เดิมที่เว็บเชื่อมอยู่
 - ถ้ากราฟ GDMT ยังแสดง **ข้อมูลสำรอง**: โปรดตรวจ Apps Script `getGdmtReviewSummary`, session/auth, และ deployment. ทั้งสองกราฟจะเปลี่ยนเป็นข้อมูลสดพร้อมกันเท่านั้น เพื่อไม่ผสมฐานคนละช่วง
 - ห้ามนำกราฟข้อมูลสำรอง ณ 17 ต.ค. ไปเรียกว่า "ข้อมูลสด" หลังจากชีตมีข้อมูลใหม่ และห้ามเปลี่ยนสิทธิ์ไฟล์เป็น public เพื่อหลบปัญหา authentication
+
+## แก้ไข 2 พฤศจิกายน 2569
+
+- รองรับ GDMT 0/0 และ DRP resolution 0/0 โดยแสดง `— · ไม่มีตัวหาร` แทนการหารศูนย์หรือ KPI ล้มเหลว และแสดงคำเตือนวันที่บริการในอนาคตจาก `_Executive_Metrics!E4`
+- ข้อมูลสำรอง ณ 02/11/2026: MTD 349/354, FMT eligibility 354/354, DRP resolution 0/0, SGLT2i 0/0; สำรองไม่ใช่ข้อมูลสด
+- **ต้อง Deploy Apps Script อีกขั้น**: นำ `AppsScript_ExecutiveDashboard.gs` เวอร์ชันล่าสุดไปอัปเดตใน Apps Script โครงการเดิม (มี login/dispatch), เพิ่ม `getExecutiveDashboardSummary` หลังตรวจ session แล้ว Deploy > Manage deployments > Edit > New version > Deploy ใน deployment เดิม
+- ทดสอบหลัง Deploy ด้วยบัญชีผู้มีสิทธิ์ว่าแสดงเวลาที่อ่านจริง, MTD ตรงชีต, 0/0 แสดงไม่มีตัวหาร และไม่มี HN รายคนถูกเผยแพร่สู่เว็บสาธารณะ
