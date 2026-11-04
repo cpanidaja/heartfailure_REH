@@ -147,5 +147,10 @@
   "definitionVersion": "HF-ALL-ROWS-20261017",
   "dataQuality": {
     "futureDatedRows": 39
+  },
+  "reportingPeriod": {
+    "start": "2026-11-01",
+    "end": "2026-11-02",
+    "source": "Dashboard!B2:D2 (ช่วงของข้อมูลสำรอง ณ 02/11/2026)"
   }
 }
