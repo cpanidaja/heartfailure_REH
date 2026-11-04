@@ -29,6 +29,7 @@ function hfReadExecutiveDashboardSummary_() {
   const mtdRows = metrics.getRange('B2:B4').getValues();
   const eligibilityRow = dashboard.getRange('B31:D31').getValues()[0];
   const stamp = sheet.getRange('A3').getDisplayValue();
+  const reportDates = dashboard.getRange('B2:D2').getValues()[0];
   const timeZone = book.getSpreadsheetTimeZone() || 'Asia/Bangkok';
   const futureCell = metrics.getRange('E4').getValue();
   const futureDatedRows = typeof futureCell === 'number' && isFinite(futureCell) && futureCell >= 0 ? Math.floor(futureCell) : null;
@@ -122,6 +123,11 @@ function hfReadExecutiveDashboardSummary_() {
     mode:'live',
     checkedAt:Utilities.formatDate(new Date(),timeZone,"yyyy-MM-dd'T'HH:mm:ss"),
     asOf:text(stamp),
+    reportingPeriod:{
+      start:reportDates[0] instanceof Date && !isNaN(reportDates[0].getTime()) ? Utilities.formatDate(reportDates[0],timeZone,'yyyy-MM-dd') : null,
+      end:reportDates[2] instanceof Date && !isNaN(reportDates[2].getTime()) ? Utilities.formatDate(reportDates[2],timeZone,'yyyy-MM-dd') : null,
+      source:'Dashboard!B2:D2'
+    },
     registry:{
       registeredShown:count(reg[0],'A6'),
       octoberVisits:count(reg[4],'E6'),
