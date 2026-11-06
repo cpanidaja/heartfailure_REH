@@ -21,6 +21,18 @@ const values=r=>r.values||r;
 const phenotype=v=>['HFrEF','HFpEF'].includes(text(v.AU))?text(v.AU):(text(v.AT)!==''&&Number.isFinite(Number(v.AT))?(Number(v.AT)<50?'HFrEF':'HFpEF'):'');
 const states=v=>defs.map(([,k,n])=>classify(v[k],v[n]));
 function complete(st){const n=st.filter(x=>x==='got').length,d=st.filter(x=>x==='got'||x==='missing').length;return {n,d,assessed:!st.includes('unknown')&&d>0,unknown:st.includes('unknown'),full:!st.includes('unknown')&&d>0&&n===d};}
+function limitationReason(value){
+ const s=text(value).toLowerCase();
+ const rules=[['สิทธิการรักษา / การเข้าถึงยา',/สิทธิ|ราคา|ค่าใช้จ่าย|เข้าไม่ถึง|access|cost/],['โพแทสเซียมสูง / Hyperkalemia',/hyperkal|โพแทสเซียมสูง|potassium high/],['ความดันต่ำ / Hypotension',/hypoten|ความดันต่ำ/],['ไต / CKD',/\bckd\b|renal|ไต|egfr/],['ชีพจรช้า / Bradycardia',/brady|ชีพจรช้า/],['หอบหืด / Bronchospasm',/asthma|bronchospasm|หอบหืด/],['ความเสี่ยง UTI',/\buti\b|urinary|ทางเดินปัสสาวะ/],['Gynecomastia',/gynecomastia|เต้านมโต/]];
+ const found=rules.filter(([,pattern])=>pattern.test(s)).map(([label])=>label);
+ return found.length>1?'ระบุหลายสาเหตุในรายการเดียว':found[0]||'ไม่ระบุสาเหตุที่จำแนกได้';
+}
+function limitationSummary(rows){
+ const reasons=new Map(),classes=defs.map(([label])=>({label,count:0,reasons:new Map()}));let visits=0,total=0;
+ rows.forEach(v=>{let limited=false;defs.forEach(([,k,n],i)=>{if(classify(v[k],v[n])!=='limited')return;limited=true;total++;const reason=limitationReason(v[n]),g=classes[i];g.count++;g.reasons.set(reason,(g.reasons.get(reason)||0)+1);reasons.set(reason,(reasons.get(reason)||0)+1);});if(limited)visits++;});
+ const list=(m,total)=>[...m].map(([label,count])=>({label,count,total,percent:rate(count,total)})).sort((a,b)=>b.count-a.count||a.label.localeCompare(b.label));
+ return {scope:'HFrEF',visits:rows.length,limitedVisits:visits,total,missingReason:reasons.get('ไม่ระบุสาเหตุที่จำแนกได้')||0,classes:classes.map(g=>({...g,total:rows.length,percent:rate(g.count,rows.length),reasons:list(g.reasons,g.count)})),reasons:list(reasons,total)};
+}
 function aggregate(patients,drps,adrs,filters={},base={}){
  const f={start:filters.start||'',end:filters.end||'',clinic:filters.clinic||'ทั้งหมด'};
  const matches=r=>{const v=values(r),date=iso(v.B);return hn(v.D)&&(!(f.start||f.end)||date)&&(!f.start||date>=f.start)&&(!f.end||date<=f.end)&&(f.clinic==='ทั้งหมด'||text(v.C)===f.clinic);};
@@ -45,8 +57,8 @@ function aggregate(patients,drps,adrs,filters={},base={}){
  mtdNumerator:count(vs,'X','ใช่'),mtdDenominator:vs.length,adherenceNumerator:count(vs,'Y','ใช่'),adherenceDenominator:count(vs,'Y','ใช่')+count(vs,'Y','ไม่ใช่'),eligibilityNumerator:count(vs,'AV','Eligible'),eligibilityDenominator:vs.filter(v=>text(v.AV)!=='').length,
  drpEvents:ev.length,drpPatients:unique(ev),drpResolvedEvents:resolvedEvents,drpVisits:vs.filter(v=>text(v.Z)==='ใช่').length,drpEventResolution:rate(resolvedEvents,ev.length),drpResolution:rate(resolvedEvents,ev.length),drpPatientResolution:rate(unique(ev.filter(resolved)),unique(ev)),drpTypes:groups(ev,'F'),interventions:groups(ev,'I'),outcomes:groups(ev,'P'),acceptance:groups(ev,'Q'),adrEvents:av.length,typeAEvents:count(av,'J','ใช่'),preventableEvents:count(av,'K','ใช่'),adrGroups:groups(av,'F'),
  readmissionCount:count(vs,'AN','ใช่'),readmission:rate(count(vs,'AN','ใช่'),vs.length),mortality:rate(count(vs,'AO','ใช่'),vs.length),kccq:average('AQ'),satisfaction:average('AP'),trend:[...months.values()].sort((a,b)=>a.label.localeCompare(b.label)),trendMode:'monthly',
- quality:{...base.quality,missingPhenotype:vs.filter(v=>!phenotype(v)).length,missingEligibility:vs.filter(v=>!text(v.AV)).length,missingAdherence:vs.filter(v=>!['ใช่','ไม่ใช่'].includes(text(v.Y))).length,unknownDrugStatus:hfr.filter(v=>states(v).includes('unknown')).length,missingKccq:vs.filter(v=>text(v.AQ)==='').length,unassessedPreventable:av.filter(v=>!['ใช่','ไม่ใช่'].includes(text(v.K))).length,missingDate:patients.filter(r=>hn(values(r).D)&&!iso(values(r).B)).length,futureDatedRows:vs.filter(v=>iso(v.B)>now).length},overdue:base.overdue||[],priorities:base.priorities||[],reviewStatus:base.reviewStatus||[],summary:base.summary||''};
+ limitationAnalysis:limitationSummary(hfr),quality:{...base.quality,missingPhenotype:vs.filter(v=>!phenotype(v)).length,missingEligibility:vs.filter(v=>!text(v.AV)).length,missingAdherence:vs.filter(v=>!['ใช่','ไม่ใช่'].includes(text(v.Y))).length,unknownDrugStatus:hfr.filter(v=>states(v).includes('unknown')).length,missingKccq:vs.filter(v=>text(v.AQ)==='').length,unassessedPreventable:av.filter(v=>!['ใช่','ไม่ใช่'].includes(text(v.K))).length,missingDate:patients.filter(r=>hn(values(r).D)&&!iso(values(r).B)).length,futureDatedRows:vs.filter(v=>iso(v.B)>now).length},overdue:base.overdue||[],priorities:base.priorities||[],reviewStatus:base.reviewStatus||[],summary:base.summary||''};
  return d;
 }
-root.HFOverview={aggregate,iso,hn,classify,complete};if(typeof module!=='undefined')module.exports=root.HFOverview;
+root.HFOverview={aggregate,iso,hn,classify,complete,limitationReason,limitationSummary};if(typeof module!=='undefined')module.exports=root.HFOverview;
 })(globalThis);
