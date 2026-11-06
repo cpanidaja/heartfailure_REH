@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');const HFOverview=require('../overview-core');
 const html=fs.readFileSync('index.html','utf8'),start=html.indexOf('const API_CACHE=new Map()'),end=html.indexOf('async function hfcLoadOverviewSupplement',start);
 const fixture={B:'2026-10-01',C:'HF',D:'0001',I:'ใช่',J:'',L:'ใช่',M:'',O:'ข้อจำกัด',P:'ข้อจำกัด CKD',R:'ข้อจำกัด',S:'ข้อจำกัดสิทธิการรักษา',X:'ใช่',Y:'ใช่',AU:'HFrEF',AV:'Eligible',BB:'เหมาะสม'};const calls=[];
-const context={HFOverview,structuredClone,Map,Set,Date,Number,Object,Promise,setTimeout,clearTimeout,sessionToken:'test-token',state:{boot:null},BACKEND_NAME:'Google Sheets',$:()=>null,showLogin:()=>{},gasCall:async(method,req)=>{
+const context={document:{querySelector:()=>null},HFOverview,structuredClone,Map,Set,Date,Number,Object,Promise,setTimeout,clearTimeout,sessionToken:'test-token',state:{view:'dashboard',boot:{schemas:{HF_Patient_Data:{fields:Object.keys(fixture).map(key=>({key}))}}}},BACKEND_NAME:'Google Sheets',$:()=>null,showLogin:()=>{},gasCall:async(method,req)=>{
  calls.push(req.method);
  if(req.method==='getDashboard')throw new Error("Cannot read properties of undefined (reading 'appropriate')");
  assert.equal(req.method,'listRecords');const [name,,page]=req.args;assert.equal(page,1);
