@@ -15,3 +15,5 @@ sandbox.state.dash=null;assert.equal(vm.runInContext('hfcExecutiveDashboardSnaps
 sandbox.state.dash=d;const limitations=vm.runInContext('hfcLimitationAnalysisHTML(state.dash)',sandbox);assert.ok(limitations.includes('สาเหตุข้อจำกัดที่บันทึก'));assert.ok(limitations.includes('<details'));assert.ok(limitations.includes('ไม่ระบุสาเหตุ'));
 
 const full=vm.runInContext('dashboardHTML(state.dash)',sandbox);assert.ok(full.includes('hfcLimitationAnalysis'));assert.ok(full.includes('Executive Dashboard'));assert.ok(full.includes('disabled placeholder'));console.log('Complete overview HTML render passed with no legacy summary or plan response.');
+
+d.review.available=false;sandbox.state.dash=d;const missing=vm.runInContext('hfcExecutiveDashboardSnapshot()',sandbox);assert.ok(missing.includes('ยังไม่สามารถดึงผลประเมินความเหมาะสมได้'));assert.ok(!missing.includes('0 / 0 ครั้ง ไม่มีตัวหารคำนวณ'));

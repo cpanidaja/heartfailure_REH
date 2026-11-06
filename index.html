@@ -1569,7 +1569,7 @@ function hfcOverviewValues(record){
  if(record&&record.values&&typeof record.values==='object'&&!Array.isArray(record.values))return record.values;
  throw Error('รูปแบบข้อมูลรายละเอียดไม่ถูกต้อง');
 }
-function hfcCompleteOverviewValues(record,keys){const v=hfcOverviewValues(record);return {...record,values:Object.fromEntries(keys.map(k=>[k,Object.hasOwn(v,k)?v[k]:'']))};}
+function hfcCompleteOverviewValues(record,keys){const v=hfcOverviewValues(record);return {...record,values:{...v,...Object.fromEntries(keys.map(k=>[k,Object.hasOwn(v,k)?v[k]:'']))}};}
 async function hfcExpandOverviewRows(name,rows){
  if(!rows.length)return rows;
  const schema=state.boot?.schemas?.[name];
@@ -1621,7 +1621,9 @@ async function hfcUnifiedDashboard(base,filters){
  const [patients,drps,adrs]=await Promise.all(['HF_Patient_Data','DRP_Log','ADR_TypeA_Log'].map(hfcReadOverviewRows));
  if(token!==sessionToken)throw Error('เซสชันเปลี่ยน กรุณาโหลดใหม่');
  for(const record of patients)hfcOverviewValues(record);
- return HFOverview.aggregate(patients,drps,adrs,filters,base);
+ const result=HFOverview.aggregate(patients,drps,adrs,filters,base);
+ result.review.available=Boolean(state.boot?.schemas?.HF_Patient_Data?.fields?.some(f=>f.key==='BB')||patients.some(r=>Object.hasOwn(r.values,'BB')));
+ return result;
 }
 async function hfcLoadOverviewSupplement(version){
  try{
@@ -1634,6 +1636,7 @@ function hfcSetOverviewFeed(d){
  const pct=(a,b)=>b?100*a/b:null;
  const k=(sourceRow,label,a,b,target)=>({sourceRow,label,actual:pct(a,b),target,unit:'percent',description:fmt(a)+' / '+fmt(b)+' ครั้ง',status:b?'':'ไม่มีตัวหาร'});
  const kpis=[k(14,'HFrEF ครบ FMT ตาม eligibility · ครั้งบริการ',d.eligibleComplete,d.eligibleCount,60),k(15,'MTD · ครั้งบริการที่มี HN',d.mtdNumerator,d.total,60),k(16,'ความร่วมมือในการใช้ยา · ครั้งที่ประเมิน',d.adherenceNumerator,d.adherenceDenominator,80),k(17,'การแก้ไข DRP สำเร็จ · เหตุการณ์',d.drpResolvedEvents,d.drpEvents,80),{...k(18,'Preventable ADR ต่อครั้งรับบริการ',d.preventableEvents,d.total,5),lowerIsBetter:true},{sourceRow:19,label:'จำนวน DRP · เหตุการณ์',actual:d.drpEvents,target:null,unit:'count',description:'ผู้ป่วย HN ไม่ซ้ำ '+fmt(d.drpPatients)+' ราย · แก้ไขสำเร็จ '+fmt(d.drpResolvedEvents)+' เหตุการณ์'},k(20,'ความเหมาะสมตาม GDMT · ครั้งที่ประเมิน',d.review.appropriate,d.review.assessed,60),k(21,'FMT eligibility · ครั้งที่มีผลประเมิน',d.eligibilityNumerator,d.eligibilityDenominator,60)];
+ if(d.review.available===false){const entry=kpis.find(k=>k.sourceRow===20);entry.actual=null;entry.status='ข้อมูลยังไม่พร้อม';entry.description='ยังไม่สามารถดึงผลประเมินความเหมาะสมได้ จึงไม่สรุปว่าผู้ป่วยยังไม่ได้รับการประเมิน';}
  HFC_EXECUTIVE_FEED={source:'HF_Patient_Data / DRP_Log / ADR_TypeA_Log',scope:'filtered',mode:'live',checkedAt:d.updatedAt,reportingPeriod:d.filters,kpis,gdmt:d.gdmt.map(g=>({label:g.label,received:g.count,assessed:g.total,percent:g.percent})),registry:{registeredShown:d.total,octoberVisits:d.total,octoberUnique:d.patientCount,mtdNumerator:d.mtdNumerator,mtdDenominator:d.total},eligibility:{numerator:d.eligibilityNumerator,denominator:d.eligibilityDenominator,pct:pct(d.eligibilityNumerator,d.eligibilityDenominator),missing:d.total-d.eligibilityDenominator},dataQuality:d.quality};HFC_EXEC_FEED_SOURCE='live';
 }
 
@@ -1773,6 +1776,7 @@ function hfcConstraintReviewChart(summary){
   +'</div><div class="hfc-review-footer">นับสถานะ “ข้อจำกัด” ในคอลัมน์ I, L, O, R ของทะเบียน • หน่วยเป็นจำนวนรายการกลุ่มยาต่อครั้งรับบริการ • ผู้ป่วยรายหนึ่งอาจมีข้อจำกัดหลายกลุ่ม • การมีข้อจำกัดไม่ได้หมายความว่าใช้ยาไม่เหมาะสม</div>';
 }
 function hfcGdmtAppropriatenessChart(summary){
+ if(summary?.available===false)return hfcEmpty('ยังไม่สามารถดึงผลประเมินความเหมาะสมได้')+'<p class="hfc-chart-note">บริการข้อมูลยังไม่ส่งคอลัมน์ BB จึงยังสรุปจำนวนที่ประเมินแล้วหรือยังไม่ประเมินไม่ได้</p>';
  if(!summary||!summary.visits)return hfcEmpty('ไม่พบระเบียนที่มี HN ในช่วงวันที่หรือคลินิกนี้');
  const valid=summary.assessed,share=valid?100*summary.appropriate/valid:null,all=summary.visits,ok=100*summary.appropriate/all,checked=100*valid/all;
  const isBackup=summary.readMode==='sheet-snapshot';
@@ -1795,7 +1799,7 @@ function hfcGdmtAppropriatenessChart(summary){
 /* Verified aggregate-only values sourced from Executive_Dashboard.
    IMPORTANT: these are NOT the filtered getDashboard calculations; never
    overwrite this section from getDashboard. No HN, patient names or CID. */
-const HF_WEB_BUILD='2026.11.06.6';
+const HF_WEB_BUILD='2026.11.06.7';
 const HFC_EXECUTIVE_SNAPSHOT={"schemaVersion":2,"source":"Executive_Dashboard","mode":"published","verifiedFrom":"Google Sheets aggregate cells","checkedAt":"2026-11-02","asOf":"ข้อมูลสำรองจาก Google Sheets ณ 02/11/2026 • KPI และ DRP ณ 02/11/2026 • ไม่ใช่ข้อมูลสด","note":"ข้อมูลรวมสำรองเท่านั้น ไม่ใช่ข้อมูลสด • MTD และ FMT eligibility นับ HN ซ้ำ • มีวันที่บริการในอนาคต 39 ระเบียนรอตรวจสอบ","registry":{"registeredShown":354,"octoberVisits":8,"octoberUnique":8,"mtdNumerator":349,"mtdDenominator":354,"mtdPct":98.58757062146893,"mtdCountDifference":0},"eligibility":{"numerator":354,"denominator":354,"pct":100,"pending":0,"missing":0,"unit":"visits","sourceColumn":"HF_Patient_Data!AV6:AV1098","basis":"All rows with nonblank HN and FMT eligibility value; duplicate HN counted"},"kpis":[{"label":"ความครบถ้วนของ FMT / GDMT","actual":100,"target":60,"description":"6/6 • ครั้งบริการ HFrEF ที่เข้าเกณฑ์ประเมิน (eligible-adjusted)","status":"ผ่านเกณฑ์","sourceRow":14,"unit":"percent","lowerIsBetter":false},{"label":"ร้อยละรายการรับบริการที่บันทึกถึง MTD (นับ HN ซ้ำ)","actual":98.58757062146893,"target":60,"description":"ตัวเศษ 349 ครั้งที่ตอบ MTD=ใช่ / ตัวหาร 354 ครั้งที่มี HN • รวม HN ซ้ำทั้งคู่ (*ต้องยืนยันเกณฑ์เป้าหมายรายครั้ง)","status":"ถึงเกณฑ์เชิงตัวเลข*","sourceRow":15,"unit":"percent","lowerIsBetter":false},{"label":"ความร่วมมือในการใช้ยา","actual":100,"target":80,"description":"8/8 • ครั้งบริการที่มีผลการประเมิน adherence","status":"ผ่านเกณฑ์","sourceRow":16,"unit":"percent","lowerIsBetter":false},{"label":"การแก้ไข DRP สำเร็จ • คิดต่อเหตุการณ์จาก DRP_Log","actual":null,"target":80,"description":"แก้ไขสำเร็จ 0 / 0 เหตุการณ์ DRP • 01/11–02/11/2026","status":"ไม่มีตัวหาร","sourceRow":17,"unit":"percent","lowerIsBetter":false},{"label":"อัตรา ADR ที่สามารถป้องกันได้","actual":0,"target":5,"description":"0/8 • เหตุการณ์ preventable ADR ÷ ครั้งรับบริการ; ค่ายิ่งต่ำยิ่งดี","status":"ผ่านเกณฑ์ <5%","sourceRow":18,"unit":"percent","lowerIsBetter":true},{"label":"จำนวน DRP ที่พบ • นับเหตุการณ์ใน DRP_Log","actual":0,"target":null,"description":"บันทึก 0 เหตุการณ์ • ผู้ป่วย HN ไม่ซ้ำ 1 ราย • แก้ไขสำเร็จ 0 เหตุการณ์","status":"ข้อมูลจาก DRP_Log","sourceRow":19,"unit":"count","lowerIsBetter":false},{"label":"ความเหมาะสมตาม GDMT • เฉพาะครั้งที่ประเมิน","actual":100,"target":60,"description":"เหมาะสม 8 / ไม่เหมาะสม 0 • ประเมินแล้ว 8 ครั้ง • ตัวหาร = เฉพาะครั้งที่มีผล (เหมาะสม + ไม่เหมาะสม)","status":"ผ่านเกณฑ์","sourceRow":20,"unit":"percent","lowerIsBetter":false},{"label":"FMT eligibility • เฉพาะครั้งที่มีผล (นับ HN ซ้ำ)","actual":100,"target":60,"description":"Eligible 354 / มีผลประเมิน 354 ครั้ง • ทุก HN รวม HN ซ้ำทั้งตัวเศษและตัวหาร • สถานะต้องประเมินเพิ่มรวมในตัวหาร","status":"ผ่านเกณฑ์","sourceRow":21,"unit":"percent","lowerIsBetter":false}],"gdmt":[{"label":"ACEi / ARB / ARNI","percent":100,"received":5,"assessed":5,"sourceRow":34},{"label":"β-blocker","percent":100,"received":6,"assessed":6,"sourceRow":35},{"label":"MRA","percent":100,"received":5,"assessed":5,"sourceRow":36},{"label":"SGLT2i","percent":null,"received":0,"assessed":0,"sourceRow":37}],"sourceCoordinates":{"registry":"Executive_Dashboard!A6:M6","kpis":"Executive_Dashboard!A14:E21","gdmt":"Executive_Dashboard!A34:D37","mtd":"_Executive_Metrics!B2:B4","eligibility":"Dashboard!B31:D31"},"definitionVersion":"HF-ALL-ROWS-20261017","dataQuality":{"futureDatedRows":39},"reportingPeriod":{"start":"2026-11-01","end":"2026-11-02","source":"Dashboard!B2:D2 (ช่วงของข้อมูลสำรอง ณ 02/11/2026)"}};
 let HFC_EXECUTIVE_FEED=HFC_EXECUTIVE_SNAPSHOT,HFC_EXEC_FEED_LOADED=false,HFC_EXEC_FEED_LOADING=false,HFC_EXEC_FEED_CHECKED=null,HFC_EXEC_FEED_SOURCE='snapshot',HFC_EXEC_FEED_ERROR='';
 function hfcExecKpis(){return (HFC_EXECUTIVE_FEED.kpis||[]).map(r=>({...r}));}
@@ -1851,7 +1855,7 @@ function hfcExecutiveKpiChart(){
   const goal=Number.isFinite(Number(r.target))&&r.target!==null&&r.target!==undefined?Number(r.target):null;
   const target=goal===null?null:Math.max(0,Math.min(100,goal));
   const good=valid&&goal!==null&&(r.lowerIsBetter?value<goal:value>=goal);
-  const grade=goal===null?esc(r.status||'ไม่มีเกณฑ์เป้าหมาย'):(!valid?'ไม่มีตัวหาร':good?'ผ่านเป้าหมาย':'ยังไม่ผ่านเป้าหมาย');
+  const grade=goal===null?esc(r.status||'ไม่มีเกณฑ์เป้าหมาย'):(!valid?(r.status||'ไม่มีตัวหาร'):good?'ผ่านเป้าหมาย':'ยังไม่ผ่านเป้าหมาย');
   const gradeClass=goal!==null&&valid&&!good?' is-warning':'';
   return '<div class="hfc-execdash-row"><div class="hfc-execdash-rownames"><strong>'+esc(r.label)+'</strong><span>'+(!valid?'—':isCount?esc(fmt(value))+' เหตุการณ์':esc(percent(value)))+(goal===null?' · ไม่มีเป้าหมาย': ' / เป้า '+(r.lowerIsBetter?'&lt;':'≥')+esc(percent(target)))+'</span></div>'
    +(goal===null&&isCount?'<div class="hfc-exec-count-divider"></div>':'<div class="hfc-execdash-track"><div class="hfc-execdash-bar" style="width:'+actual.toFixed(2)+'%"></div>'+(target===null?'':'<i class="hfc-execdash-target" style="left:'+target.toFixed(2)+'%" aria-hidden="true"></i>')+'</div>')
