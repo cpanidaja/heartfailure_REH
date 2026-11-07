@@ -2194,7 +2194,17 @@ function executiveReportWithSheetKpis(model){
 function executiveHTML(model){
  model=executiveReportWithSheetKpis(model);
  const executiveSummary=(model.sections||[]).find(section=>String(section.title||'').includes('บทสรุปสำหรับผู้บริหาร')||section.id==='summary');
- if(executiveSummary)executiveSummary.paragraphs=["รายงานครอบคลุมข้อมูลคลินิกหัวใจล้มเหลวและคลินิกบูรณาการหัวใจล้มเหลว ช่วงวันที่ 1–31 ตุลาคม 2569 มีระเบียนที่แสดง 152 แถว และผู้ป่วย HN ไม่ซ้ำ 134 ราย อย่างไรก็ตาม มีวันที่รับบริการ 26 แถวที่อยู่หลังวันจัดทำรายงาน 25 ตุลาคม 2569 จึงควรตรวจสอบก่อนใช้ตัวเลขสรุปผลของเดือนตุลาคมเป็นผลจริงที่สิ้นสุดแล้ว","ผลตัวชี้วัด: จากตัวชี้วัดที่ระบบจัดประเภทได้ มี 7 รายการผ่านเป้าหมาย 1 รายการต้องติดตาม และ 2 รายการไม่มีตัวหาร ตัวชี้วัดที่ผ่านรวมถึงความครบถ้วน FMT/GDMT 84.8% (95/112 ครั้งบริการ HFrEF ที่เข้าเกณฑ์ประเมิน) ซึ่งสูงกว่าเป้าหมาย ≥60% และความเหมาะสมตาม GDMT เฉพาะครั้งที่ประเมิน 100% (126/126 ครั้ง)","การแปลผล FMT: ความครบถ้วน FMT/GDMT แบบปรับตาม eligibility อยู่ที่ 84.8% (95/112 ครั้งบริการ HFrEF ที่เข้าเกณฑ์ประเมิน) ตามข้อมูลใน Executive Dashboard ซึ่งสูงกว่าเป้าหมาย ≥60%","ด้านความปลอดภัยและปัญหาจากการใช้ยา: พบ DRP 14 เหตุการณ์ และ ADR 1 เหตุการณ์ โดยรายงาน Type A 1 เหตุการณ์ และ preventable ADR 0 เหตุการณ์ ให้แสดงเป็นตัวชี้วัดแยกกันตามนิยามของแต่ละรายการ","ข้อจำกัดในการแปลผล: ตัวเลขจาก Executive Dashboard อ้างอิงข้อมูลตามวันที่และฐานนับที่ระบุในชีตต้นฉบับ ซึ่งอาจไม่ตรงกับตัวกรองช่วงเวลาในรายงานบนเว็บ ก่อนเผยแพร่ผลเดือนตุลาคมฉบับสมบูรณ์ ควรตรวจสอบวันที่บริการ 26 แถวที่เกินวันจัดทำรายงาน และยืนยันฐานนับของ KPI ทุกตัว"];
+ if(executiveSummary){
+  const period=model.period||{},summary=model.summary||{};
+  const range=period.start&&period.end?'ช่วงวันที่ '+dateTH(period.start)+' ถึง '+dateTH(period.end):'ตามช่วงวันที่ที่เลือก';
+  const clinic=period.clinic||'ทุกคลินิก';
+  executiveSummary.paragraphs=[
+   'รายงานนี้สรุปข้อมูลคลินิกหัวใจล้มเหลวและคลินิกบูรณาการหัวใจล้มเหลว '+range+' สำหรับ'+clinic+' มีผู้ป่วย HN ไม่ซ้ำ '+fmt(summary.patients||0)+' ราย และครั้งรับบริการ '+fmt(summary.visits||0)+' ครั้ง โดยนับจากข้อมูลที่อยู่ในช่วงเวลานี้',
+   'ผลตัวชี้วัดในรายงานช่วงที่เลือก: ผ่านเป้าหมาย '+fmt(summary.passed||0)+' รายการ ต้องติดตาม '+fmt(summary.notMet||0)+' รายการ และไม่มีตัวหาร/ไม่สามารถประเมิน '+fmt(summary.notAssessable||0)+' รายการ รายละเอียดและค่าฐานของแต่ละตัวชี้วัดแสดงในตารางด้านล่าง',
+   'การแปลผลทางคลินิกและความปลอดภัย: ค่า FMT/GDMT, DRP และ ADR ในรายงานนี้อ้างอิงช่วงวันที่และคลินิกที่เลือก โดยใช้หน่วยนับตามนิยามของแต่ละตาราง เช่น ผู้ป่วย HN ไม่ซ้ำ ครั้งรับบริการ หรือจำนวนเหตุการณ์ จึงควรอ่านตัวเศษ ตัวหาร และคำอธิบายใต้ตารางประกอบกัน',
+   'ข้อจำกัดในการเปรียบเทียบ: ตัวเลขจากทะเบียนสะสมหรือ Executive Dashboard ที่ไม่ได้คำนวณด้วยตัวกรองเดียวกันอาจมีช่วงเวลาและฐานนับต่างจากรายงานนี้ จึงไม่นำตัวเลขดังกล่าวมาแทนผลของช่วงที่เลือก หากพบวันที่บริการอยู่นอกช่วงหรือข้อมูลไม่ครบ ให้ตรวจสอบรายการต้นทางก่อนนำเสนอ'
+  ];
+ }
  return heading('บทสรุปสำหรับผู้บริหาร','รายงานภาพรวมครบทุกประเด็น พร้อมคำอธิบายฐานนับและข้อจำกัดใต้ทุกตาราง','<div class="executive-actions"><button id="exportDocx" class="btn btn-primary">'+icon('download')+'DOCX</button><button id="exportXlsx" class="btn">'+icon('download')+'Excel</button><button id="printExecutive" class="btn">'+icon('print')+'พิมพ์</button></div>','EXECUTIVE INTELLIGENCE')+toolbar()+
  '<div class="detail-kpis">'+metric('ผู้ป่วย HN ไม่ซ้ำ',fmt(model.summary.patients),'ช่วงข้อมูลที่เลือก','users')+metric('ครั้งรับบริการ',fmt(model.summary.visits),'ข้อมูลครบทุกแถวที่เกี่ยวข้อง','activity')+metric('ผ่านเป้าหมาย',fmt(model.summary.passed),'ตามนิยามตัวชี้วัดต้นฉบับ','check')+metric('ต้องติดตาม',fmt(model.summary.notMet),'ไม่มีตัวหาร '+model.summary.notAssessable+' รายการ','alert')+'</div>'+
  hfcExecutiveDashboardSnapshot()+
