@@ -1,0 +1,15 @@
+const assert=require('node:assert/strict');
+const {aggregate,iso,columns}=require('../lab-core');
+const row=(values)=>({values:{B:'2026-11-17',D:'1',F:60,G:'ชาย',BU:'2026-11-17',...values}});
+const options={asOf:'2026-11-19'};
+assert.equal(iso('19/11/2569'),'2026-11-19');assert.equal(iso('31/02/2026'),'');
+const records=[row({D:'001',BW:45,BX:5.1,CN:12.2}),row({D:1,BW:45,BX:5.1,CN:12.2}),row({D:2,BW:29,BX:5.2,CN:13.8,F:82,G:'หญิง'}),row({D:3,BW:14,BX:'3.7; 5.8'}),row({D:4,B:'2026-11-23',BW:90}),row({D:5,BU:'',BW:70}),row({D:6,BU:'2026-01-01',BW:60,BX:3.4}),row({D:7,BW:90}),row({D:8,BW:30}),row({D:9,BW:59})];
+const d=aggregate(records,null,options),get=id=>d.labs.find(t=>t.id===id);
+assert.equal(d.total,8);assert.deepEqual(d.stages,[1,1,2,1,1,1]);assert.equal(get('k').high,1);assert.equal(get('k').low,1);assert.equal(get('k').conflict,1);assert.equal(get('hb').low,1);assert.equal(d.hbExcluded,1);assert.equal(d.quality.future,1);assert.equal(d.quality.undated,1);assert.equal(d.any,6);
+const recent=aggregate(records,null,{...options,days:90});assert.equal(recent.labs.find(t=>t.id==='k').old,1);
+const conflict=aggregate([row({BX:4}),row({BX:6})],null,options);assert.equal(conflict.labs.find(t=>t.id==='k').n,0);assert.equal(conflict.labs.find(t=>t.id==='k').conflict,1);
+const note=aggregate([row({BU:'2026-06-01',BW:34,BX:3.9,AS:'รับบริการ 17/11/2569 เวลา 06:49; ผลตรวจครั้งนี้: Cr 2.19, eGFR 26, K 4.0; คงผลแล็บเดิม'})],null,options);assert.equal(note.stages[4],1);assert.equal(note.labs.find(t=>t.id==='k').last,'2026-11-17');
+const multi=aggregate([row({BU:'2026-06-01',BX:4,AS:'ผลแล็บวันที่ 15/09/2569: Creatinine 1.64, eGFR 49; K ผลลำดับ 3 = 4.3 และผลลำดับ 4 = 5.5; คงผลเดิม'})],null,options);assert.equal(multi.labs.find(t=>t.id==='k').conflict,1);
+const schema={fields:[{key:'BE',label:'วันที่อ้างอิงผลตรวจ'},{key:'BG',label:'eGFR (unit)'}]};assert.equal(columns(schema).date,'BE');assert.equal(columns(schema).tests.find(t=>t.id==='egfr').key,'BG');
+assert.equal(aggregate([],null,options).total,0);
+console.log('Lab tests passed: unique HN, boundaries, anemia eligibility, dates, conflicts, notes, schema mapping, missing data and age filter.');
